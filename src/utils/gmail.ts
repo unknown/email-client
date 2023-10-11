@@ -1,7 +1,7 @@
-import { authenticate } from "@google-cloud/local-auth";
 import fs from "fs/promises";
-import { Auth, gmail_v1, google } from "googleapis";
 import path from "path";
+import { authenticate } from "@google-cloud/local-auth";
+import { Auth, gmail_v1, google } from "googleapis";
 
 const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
 const TOKEN_PATH = path.join(process.cwd(), "token.json");
