@@ -1,7 +1,7 @@
 import path from "node:path";
 import { app, BrowserWindow, ipcMain } from "electron";
 
-import { authorize, createGmailClient, listLabels } from "../utils/gmail";
+import { authorize, createGmailClient, listLabels } from "./utils/gmail";
 
 async function getLabels() {
   return authorize().then(createGmailClient).then(listLabels).catch(console.error);
