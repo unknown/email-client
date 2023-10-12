@@ -1,10 +1,26 @@
 import path from "node:path";
 import { app, BrowserWindow, ipcMain } from "electron";
+import { gmail_v1 } from "googleapis";
 
-import { authorize, createGmailClient, listLabels } from "./utils/gmail";
+import { authorize, createGmailClient, listLabels, listThreads } from "./utils/gmail";
+
+let _gmailClient: gmail_v1.Gmail;
+
+async function getGmailClient() {
+  if (!_gmailClient) {
+    _gmailClient = await authorize().then(createGmailClient);
+  }
+  return _gmailClient;
+}
 
 async function getLabels() {
-  return authorize().then(createGmailClient).then(listLabels).catch(console.error);
+  return getGmailClient().then(listLabels).catch(console.error);
+}
+
+async function getThreads(labelIds: string[]) {
+  return getGmailClient()
+    .then((client) => listThreads(client, labelIds))
+    .catch(console.error);
 }
 
 const createWindow = () => {
@@ -26,7 +42,10 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
-  ipcMain.handle("get-labels", getLabels);
+  ipcMain.handle("gmail/get-labels", getLabels);
+  ipcMain.handle("gmail/get-threads", async (_, ...args) => {
+    return getThreads(args);
+  });
 
   createWindow();
 

@@ -1,28 +1,38 @@
-import { useState } from "react";
+import { gmail_v1 } from "googleapis";
+import { useEffect, useState } from "react";
+
+import { LabelList } from "./components/label-list";
+import { ThreadList } from "./components/thread-list";
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [labels, setLabels] = useState<string[]>();
+  const [labels, setLabels] = useState<gmail_v1.Schema$Label[] | null>(null);
+  const [threads, setThreads] = useState<gmail_v1.Schema$Thread[] | null>(null);
 
-  async function updateLabels() {
-    const labels = (await window.gmail.getLabels()) ?? [];
-    setLabels(labels);
+  useEffect(() => {
+    let canceled = false;
+    async function loadLabels() {
+      const labels = (await window.gmail.getLabels()) ?? [];
+      if (!canceled) {
+        setLabels(labels);
+      }
+    }
+    loadLabels();
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
+  async function onLabelClick(label: string) {
+    const threads = (await window.gmail.getThreads([label])) ?? [];
+    setThreads(threads);
   }
 
   return (
     <div className="space-y-3 p-4">
-      <h1 className="underline">email client</h1>
-      <button
-        className="px-2 py-3 bg-gray-200 rounded-lg"
-        onClick={() => setCount((count) => count + 1)}
-      >
-        count is {count}
-      </button>
-      <div>
-        <button className="px-2 py-3 bg-gray-200 rounded-lg" onClick={updateLabels}>
-          get labels
-        </button>
-        {labels?.map((label, i) => <div key={i}>{label}</div>)}
+      <h1 className="text-lg underline">email client</h1>
+      <div className="flex gap-2">
+        <LabelList labels={labels} onLabelClick={onLabelClick} />
+        <ThreadList threads={threads} />
       </div>
     </div>
   );
