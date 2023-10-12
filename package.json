@@ -1,7 +1,6 @@
 {
   "name": "email-client",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "clean": "rm -rf node_modules dist",
     "dev": "nodemon",

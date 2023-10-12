@@ -1,4 +1,4 @@
-import { authorize, createGmailClient, listLabels, listThreads } from "./utils/gmail.js";
+import { authorize, createGmailClient, listLabels, listThreads } from "./utils/gmail";
 
 authorize()
   .then(createGmailClient)
