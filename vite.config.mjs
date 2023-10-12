@@ -5,10 +5,10 @@ export default defineConfig({
   plugins: [
     electron({
       main: {
-        entry: "src/electron/main.ts",
+        entry: "electron/main.ts",
       },
       preload: {
-        input: "src/electron/preload.ts",
+        input: "electron/preload.ts",
       },
     }),
   ],
