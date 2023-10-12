@@ -1,7 +1,7 @@
 import path from "node:path";
 import { app, BrowserWindow, ipcMain } from "electron";
 
-import { authorize, createGmailClient, listLabels } from "./utils/gmail";
+import { authorize, createGmailClient, listLabels } from "../utils/gmail";
 
 async function getLabels() {
   return authorize().then(createGmailClient).then(listLabels).catch(console.error);
@@ -16,7 +16,13 @@ const createWindow = () => {
     },
   });
 
-  win.loadFile(path.join(__dirname, "../../index.html"));
+  if (process.env.VITE_DEV_SERVER_URL) {
+    win.loadURL(process.env.VITE_DEV_SERVER_URL);
+    win.webContents.openDevTools();
+  } else {
+    // TODO: fix this
+    win.loadFile(path.join(__dirname, "../index.html"));
+  }
 };
 
 app.whenReady().then(() => {
