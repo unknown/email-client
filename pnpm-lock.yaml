@@ -26,8 +26,8 @@ devDependencies:
     specifier: ^20.8.4
     version: 20.8.4
   electron:
-    specifier: ^26.0.0
-    version: 26.0.0
+    specifier: ^27.0.0
+    version: 27.0.0
   typescript:
     specifier: ^5.2.2
     version: 5.2.2
@@ -594,8 +594,8 @@ packages:
     resolution: {integrity: sha512-gpXfJslSi4hYDkA0mTLEpYKRv9siAgSUgZ+UWyk+J5Cttpd1ThCVwdclzIwQSclz3hYn049+M2fgrP1WpvF8xg==}
     dev: false
 
-  /electron@26.0.0:
-    resolution: {integrity: sha512-x57bdCaDvgnlc41VOm/UWihJCCiI3OxJKiBgB/e5F7Zd6avo+61mO6IzQS7Bu/k/a1KPjou25EUORR6UPKznBQ==}
+  /electron@27.0.0:
+    resolution: {integrity: sha512-mr3Zoy82l8XKK/TgguE5FeNeHZ9KHXIGIpUMjbjZWIREfAv+X2Q3vdX6RG0Pmi1K23AFAxANXQezIHBA2Eypwg==}
     engines: {node: '>= 12.20.55'}
     hasBin: true
     requiresBuild: true
