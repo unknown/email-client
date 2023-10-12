@@ -16,7 +16,7 @@ export function ThreadList({ threads }: ThreadListProps) {
   return (
     <div className="flex flex-col gap-3">
       {threads?.map((thread, i) => (
-        <div key={i}>
+        <div key={thread.id ?? i}>
           <p className="text-sm text-gray-600">{thread.id}</p>
           <p>{thread.snippet}</p>
         </div>

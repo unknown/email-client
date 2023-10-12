@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import path from "path";
+import path from "node:path";
 import { authenticate } from "@google-cloud/local-auth";
 import { Auth, gmail_v1, google } from "googleapis";
 

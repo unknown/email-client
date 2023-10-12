@@ -11,7 +11,7 @@ function App() {
   useEffect(() => {
     let canceled = false;
     async function loadLabels() {
-      const labels = (await window.gmail.getLabels()) ?? [];
+      const labels = (await window.gmail.listLabels()) ?? [];
       if (!canceled) {
         setLabels(labels);
       }
@@ -23,7 +23,7 @@ function App() {
   }, []);
 
   async function onLabelClick(label: string) {
-    const threads = (await window.gmail.getThreads([label])) ?? [];
+    const threads = (await window.gmail.listThreads([label])) ?? [];
     setThreads(threads);
   }
 
