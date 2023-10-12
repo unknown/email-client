@@ -1,28 +1,52 @@
-import { useState } from "react";
+import { gmail_v1 } from "googleapis";
+import { useEffect, useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [labels, setLabels] = useState<string[]>();
+  const [labels, setLabels] = useState<gmail_v1.Schema$Label[]>();
+  const [threads, setThreads] = useState<gmail_v1.Schema$Thread[]>();
 
-  async function updateLabels() {
-    const labels = (await window.gmail.getLabels()) ?? [];
-    setLabels(labels);
+  useEffect(() => {
+    let canceled = false;
+    async function loadLabels() {
+      const labels = (await window.gmail.getLabels()) ?? [];
+      if (!canceled) {
+        setLabels(labels);
+      }
+    }
+    loadLabels();
+    return () => {
+      canceled = true;
+    };
+  }, []);
+
+  async function onThreadClick(label: string) {
+    const threads = (await window.gmail.getThreads([label])) ?? [];
+    setThreads(threads);
   }
 
   return (
     <div className="space-y-3 p-4">
-      <h1 className="underline">email client</h1>
-      <button
-        className="px-2 py-3 bg-gray-200 rounded-lg"
-        onClick={() => setCount((count) => count + 1)}
-      >
-        count is {count}
-      </button>
-      <div>
-        <button className="px-2 py-3 bg-gray-200 rounded-lg" onClick={updateLabels}>
-          get labels
-        </button>
-        {labels?.map((label, i) => <div key={i}>{label}</div>)}
+      <h1 className="text-lg underline">email client</h1>
+      <div className="flex gap-2">
+        <div>
+          {labels?.map((label, i) => (
+            <div key={i} onClick={() => onThreadClick(label.id ?? "")}>
+              {label.id}
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col gap-2">
+          {threads === undefined
+            ? "Nothing selected"
+            : threads?.length == 0
+            ? "Empty"
+            : threads?.map((thread, i) => (
+                <div key={i}>
+                  <p className="text-sm text-gray-600">{thread.id}</p>
+                  <p>{thread.snippet}</p>
+                </div>
+              ))}
+        </div>
       </div>
     </div>
   );

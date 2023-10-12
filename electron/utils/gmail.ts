@@ -55,8 +55,7 @@ export async function listLabels(gmail: gmail_v1.Gmail) {
   const res = await gmail.users.labels.list({
     userId: "me",
   });
-  const labels = res.data.labels;
-  return labels?.map((label) => label.name);
+  return res.data.labels;
 }
 
 export async function listThreads(gmail: gmail_v1.Gmail, labelIds: string[]) {
@@ -65,6 +64,5 @@ export async function listThreads(gmail: gmail_v1.Gmail, labelIds: string[]) {
     userId: "me",
     maxResults: 5,
   });
-  const threads = res.data.threads;
-  return threads?.map((thread) => `${thread.id}: ${thread.snippet}`);
+  return res.data.threads;
 }
