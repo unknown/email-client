@@ -56,14 +56,7 @@ export async function listLabels(gmail: gmail_v1.Gmail) {
     userId: "me",
   });
   const labels = res.data.labels;
-  if (!labels || labels.length === 0) {
-    console.log("No labels found.");
-    return;
-  }
-  console.log("Labels:");
-  labels.forEach((label) => {
-    console.log(`- ${label.name}`);
-  });
+  return labels?.map((label) => label.name);
 }
 
 export async function listThreads(gmail: gmail_v1.Gmail, labelIds: string[]) {
@@ -73,12 +66,5 @@ export async function listThreads(gmail: gmail_v1.Gmail, labelIds: string[]) {
     maxResults: 5,
   });
   const threads = res.data.threads;
-  if (!threads || threads.length === 0) {
-    console.log("No threads found.");
-    return;
-  }
-  console.log("Threads:");
-  threads.forEach((thread) => {
-    console.log(`- [${thread.id}]: ${thread.snippet}`);
-  });
+  return threads?.map((thread) => `${thread.id}: ${thread.snippet}`);
 }
