@@ -4,7 +4,6 @@
   "main": "dist/src/main.js",
   "scripts": {
     "clean": "rm -rf node_modules dist",
-    "dev": "nodemon",
     "build": "tsc",
     "start": "electron ."
   },
@@ -18,7 +17,6 @@
   "devDependencies": {
     "@types/node": "^20.8.4",
     "electron": "^26.0.0",
-    "nodemon": "^3.0.1",
     "typescript": "^5.2.2"
   }
 }
