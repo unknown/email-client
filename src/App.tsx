@@ -1,9 +1,12 @@
 import { gmail_v1 } from "googleapis";
 import { useEffect, useState } from "react";
 
+import { LabelList } from "./components/label-list";
+import { ThreadList } from "./components/thread-list";
+
 function App() {
-  const [labels, setLabels] = useState<gmail_v1.Schema$Label[]>();
-  const [threads, setThreads] = useState<gmail_v1.Schema$Thread[]>();
+  const [labels, setLabels] = useState<gmail_v1.Schema$Label[] | null>(null);
+  const [threads, setThreads] = useState<gmail_v1.Schema$Thread[] | null>(null);
 
   useEffect(() => {
     let canceled = false;
@@ -19,7 +22,7 @@ function App() {
     };
   }, []);
 
-  async function onThreadClick(label: string) {
+  async function onLabelClick(label: string) {
     const threads = (await window.gmail.getThreads([label])) ?? [];
     setThreads(threads);
   }
@@ -28,25 +31,8 @@ function App() {
     <div className="space-y-3 p-4">
       <h1 className="text-lg underline">email client</h1>
       <div className="flex gap-2">
-        <div>
-          {labels?.map((label, i) => (
-            <div key={i} onClick={() => onThreadClick(label.id ?? "")}>
-              {label.id}
-            </div>
-          ))}
-        </div>
-        <div className="flex flex-col gap-2">
-          {threads === undefined
-            ? "Nothing selected"
-            : threads?.length == 0
-            ? "Empty"
-            : threads?.map((thread, i) => (
-                <div key={i}>
-                  <p className="text-sm text-gray-600">{thread.id}</p>
-                  <p>{thread.snippet}</p>
-                </div>
-              ))}
-        </div>
+        <LabelList labels={labels} onLabelClick={onLabelClick} />
+        <ThreadList threads={threads} />
       </div>
     </div>
   );
