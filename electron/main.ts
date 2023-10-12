@@ -23,6 +23,12 @@ async function listThreads(labelIds: string[]) {
     .catch(console.error);
 }
 
+async function getThread(id: string) {
+  return getGmailClient()
+    .then((client) => gmailUtils.getThread(client, id))
+    .catch(console.error);
+}
+
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
@@ -44,6 +50,7 @@ const createWindow = () => {
 app.whenReady().then(() => {
   ipcMain.handle("gmail/list-labels", listLabels);
   ipcMain.handle("gmail/list-threads", async (_, labelIds) => listThreads(labelIds));
+  ipcMain.handle("gmail/get-thread", async (_, id) => getThread(id));
 
   createWindow();
 

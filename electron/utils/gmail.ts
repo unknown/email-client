@@ -66,3 +66,12 @@ export async function listThreads(gmail: gmail_v1.Gmail, labelIds: string[]) {
   });
   return res.data.threads;
 }
+
+export async function getThread(gmail: gmail_v1.Gmail, id: string) {
+  const res = await gmail.users.threads.get({
+    id,
+    userId: "me",
+    format: "full",
+  });
+  return res.data;
+}
