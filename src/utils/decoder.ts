@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import { gmail_v1 } from "googleapis";
 
 function decodeBase64(base64: string) {
@@ -43,24 +44,30 @@ function flattenParts(
   }
 }
 
+export type DecodedMessage = { html: string | null; text: string | null };
+
 export function decodeMessage(message: gmail_v1.Schema$Message) {
+  const decodedMessage: DecodedMessage = { html: null, text: null };
   const { payload } = message;
+
   if (!payload) {
-    return null;
+    return decodedMessage;
   }
 
   const flattened: gmail_v1.Schema$MessagePart[] = [];
   flattenParts([payload], flattened);
 
   const html = flattened.find((part) => part.mimeType === "text/html");
+  const text = flattened.find((part) => part.mimeType === "text/plain");
   if (typeof html?.body?.data == "string") {
-    return decodeBody(html.body.data);
+    const dirtyHtml = decodeBody(html.body.data);
+    if (dirtyHtml !== null) {
+      decodedMessage.html = DOMPurify.sanitize(dirtyHtml);
+    }
+  }
+  if (typeof text?.body?.data == "string") {
+    decodedMessage.text = decodeBody(text.body.data);
   }
 
-  const plain = flattened.find((part) => part.mimeType === "text/plain");
-  if (typeof plain?.body?.data == "string") {
-    return decodeBody(plain.body.data);
-  }
-
-  return null;
+  return decodedMessage;
 }

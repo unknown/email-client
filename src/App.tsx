@@ -1,6 +1,7 @@
 import { gmail_v1 } from "googleapis";
 import { useEffect, useState } from "react";
 
+import { EmailPreview } from "./components/email-preview";
 import { LabelList } from "./components/label-list";
 import { ThreadList } from "./components/thread-list";
 import { decodeMessage } from "./utils/decoder";
@@ -46,12 +47,11 @@ function App() {
           <ThreadList threads={threads} onThreadClick={updateThread} />
         </div>
       </div>
-      <div>
-        {thread?.messages?.map((message) => (
-          <div key={message.id ?? ""} className="break-words">
-            {decodeMessage(message) || "Decoder not implemented"}
-          </div>
-        ))}
+      <div className="flex flex-col gap-4">
+        {thread?.messages?.map((message, i) => {
+          const decodedMessage = decodeMessage(message);
+          return <EmailPreview key={message.id ?? i} decodedMessage={decodedMessage} />;
+        })}
       </div>
     </div>
   );
