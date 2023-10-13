@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { EmailPreview } from "./components/email-preview";
 import { LabelList } from "./components/label-list";
 import { ThreadList } from "./components/thread-list";
-import { decodeMessage } from "./utils/decoder";
 
 function App() {
   const [labels, setLabels] = useState<gmail_v1.Schema$Label[] | null>(null);
@@ -40,7 +39,7 @@ function App() {
     <div className="space-y-3 p-4">
       <h1 className="text-lg underline">email client</h1>
       <div className="flex gap-2">
-        <div className="flex-1">
+        <div>
           <LabelList labels={labels} onLabelClick={updateThreads} />
         </div>
         <div className="flex-1">
@@ -49,8 +48,7 @@ function App() {
       </div>
       <div className="flex flex-col gap-4">
         {thread?.messages?.map((message, i) => {
-          const decodedMessage = decodeMessage(message);
-          return <EmailPreview key={message.id ?? i} decodedMessage={decodedMessage} />;
+          return <EmailPreview key={message.id ?? i} message={message} />;
         })}
       </div>
     </div>

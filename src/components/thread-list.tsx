@@ -18,7 +18,6 @@ export function ThreadList({ threads, onThreadClick }: ThreadListProps) {
     <div className="flex flex-col gap-3">
       {threads?.map((thread, i) => (
         <div key={thread.id ?? i} onClick={() => onThreadClick(thread.id ?? "")}>
-          <p className="text-sm text-gray-600">{thread.id}</p>
           <p>{thread.snippet}</p>
         </div>
       ))}

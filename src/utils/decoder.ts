@@ -44,14 +44,17 @@ function flattenParts(
   }
 }
 
-export type DecodedMessage = { html: string | null; text: string | null };
+export type DecodedPayload = {
+  html: string | null;
+  text: string | null;
+  headers: Record<string, string>;
+};
 
-export function decodeMessage(message: gmail_v1.Schema$Message) {
-  const decodedMessage: DecodedMessage = { html: null, text: null };
-  const { payload } = message;
+export function decodePayload(payload: gmail_v1.Schema$MessagePart | undefined) {
+  const decodedPayload: DecodedPayload = { html: null, text: null, headers: {} };
 
   if (!payload) {
-    return decodedMessage;
+    return decodedPayload;
   }
 
   const flattened: gmail_v1.Schema$MessagePart[] = [];
@@ -61,11 +64,18 @@ export function decodeMessage(message: gmail_v1.Schema$Message) {
   const text = flattened.find((part) => part.mimeType === "text/plain");
   if (typeof html?.body?.data == "string") {
     const dirtyHtml = decodeBody(html.body.data);
-    decodedMessage.html = dirtyHtml ? DOMPurify.sanitize(dirtyHtml) : null;
+    decodedPayload.html = dirtyHtml ? DOMPurify.sanitize(dirtyHtml) : null;
   }
   if (typeof text?.body?.data == "string") {
-    decodedMessage.text = decodeBody(text.body.data);
+    decodedPayload.text = decodeBody(text.body.data);
   }
 
-  return decodedMessage;
+  payload.headers?.map(({ name, value }) => {
+    if (!name || !value) {
+      return;
+    }
+    decodedPayload.headers[name] = value;
+  });
+
+  return decodedPayload;
 }
