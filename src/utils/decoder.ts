@@ -61,9 +61,7 @@ export function decodeMessage(message: gmail_v1.Schema$Message) {
   const text = flattened.find((part) => part.mimeType === "text/plain");
   if (typeof html?.body?.data == "string") {
     const dirtyHtml = decodeBody(html.body.data);
-    if (dirtyHtml !== null) {
-      decodedMessage.html = DOMPurify.sanitize(dirtyHtml);
-    }
+    decodedMessage.html = dirtyHtml ? DOMPurify.sanitize(dirtyHtml) : null;
   }
   if (typeof text?.body?.data == "string") {
     decodedMessage.text = decodeBody(text.body.data);
