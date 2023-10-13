@@ -9,8 +9,8 @@ export function LabelList({ labels, onLabelClick }: LabelListProps) {
   return (
     <div>
       {labels?.map((label, i) => (
-        <div key={i} onClick={() => onLabelClick(label.id ?? "")}>
-          {label.id}
+        <div key={label.id ?? i} onClick={() => onLabelClick(label.id ?? "")}>
+          {label.name}
         </div>
       ))}
     </div>

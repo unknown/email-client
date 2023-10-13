@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import path from "path";
+import path from "node:path";
 import { authenticate } from "@google-cloud/local-auth";
 import { Auth, gmail_v1, google } from "googleapis";
 
@@ -65,4 +65,13 @@ export async function listThreads(gmail: gmail_v1.Gmail, labelIds: string[]) {
     maxResults: 5,
   });
   return res.data.threads;
+}
+
+export async function getThread(gmail: gmail_v1.Gmail, id: string) {
+  const res = await gmail.users.threads.get({
+    id,
+    userId: "me",
+    format: "full",
+  });
+  return res.data;
 }
