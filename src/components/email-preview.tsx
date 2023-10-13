@@ -21,12 +21,31 @@ export function EmailPreview({ message }: EmailPreviewProps) {
     htmlToRender = "Email could not be decoded";
   }
 
+  const from = headers["From"];
+  const to = headers["Delivered-To"] ?? headers["To"];
+  const cc = headers["Cc"];
+  const replyTo = headers["Reply-To"];
+
   return (
-    <div className="flex flex-col gap-4 outline p-2 outline-gray-200">
-      <div className="flex justify-between items-center text-gray-600">
+    <div className="flex flex-col gap-4 outline p-4 outline-gray-200">
+      <div className="flex justify-between">
         <div>
-          <div>From: {headers["From"]}</div>
-          <div>To: {headers["Delivered-To"] ?? headers["To"]}</div>
+          <div>
+            From: <span className="text-gray-600">{from}</span>
+          </div>
+          <div>
+            To: <span className="text-gray-600">{to}</span>
+          </div>
+          {cc && (
+            <div>
+              Cc: <span className="text-gray-600">{cc}</span>
+            </div>
+          )}
+          {replyTo && (
+            <div>
+              Reply To: <span className="text-gray-600">{replyTo}</span>
+            </div>
+          )}
         </div>
         <div>{dateString}</div>
       </div>
