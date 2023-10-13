@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import { LabelList } from "./components/label-list";
 import { ThreadList } from "./components/thread-list";
+import { decodeMessage } from "./utils/decoder";
 
 function App() {
   const [labels, setLabels] = useState<gmail_v1.Schema$Label[] | null>(null);
@@ -26,6 +27,7 @@ function App() {
   async function updateThreads(labelId: string) {
     const threads = (await window.gmail.listThreads([labelId])) ?? [];
     setThreads(threads);
+    setThread(null);
   }
 
   async function updateThread(threadId: string) {
@@ -37,9 +39,19 @@ function App() {
     <div className="space-y-3 p-4">
       <h1 className="text-lg underline">email client</h1>
       <div className="flex gap-2">
-        <LabelList labels={labels} onLabelClick={updateThreads} />
-        <ThreadList threads={threads} onThreadClick={updateThread} />
-        <div>{thread?.messages?.length}</div>
+        <div className="flex-1">
+          <LabelList labels={labels} onLabelClick={updateThreads} />
+        </div>
+        <div className="flex-1">
+          <ThreadList threads={threads} onThreadClick={updateThread} />
+        </div>
+      </div>
+      <div>
+        {thread?.messages?.map((message) => (
+          <div key={message.id ?? ""} className="break-words">
+            {decodeMessage(message) || "Decoder not implemented"}
+          </div>
+        ))}
       </div>
     </div>
   );
