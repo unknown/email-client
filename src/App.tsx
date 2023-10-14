@@ -1,7 +1,7 @@
 import { gmail_v1 } from "googleapis";
 import { useEffect, useState } from "react";
 
-import { EmailPreview } from "./components/email-preview";
+import { EmailThread } from "./components/email-thread";
 import { ThreadList } from "./components/thread-list";
 
 function App() {
@@ -28,11 +28,10 @@ function App() {
   }
 
   return (
-    <div className="space-y-3 p-4">
-      <h1 className="text-lg underline">email client</h1>
-      <div className="grid grid-cols-2 gap-2">
+    <div className="flex max-h-screen flex-col gap-2">
+      <div className="grid min-h-0 flex-1 flex-shrink grid-cols-[300px_1fr] divide-x">
         <ThreadList threads={threads} onThreadClick={updateThread} />
-        <EmailPreview thread={thread} />
+        <EmailThread thread={thread} />
       </div>
     </div>
   );

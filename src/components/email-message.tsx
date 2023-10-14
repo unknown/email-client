@@ -2,11 +2,11 @@ import { gmail_v1 } from "googleapis";
 
 import { decodePayload } from "../utils/decoder";
 
-type EmailMessagePreviewProps = {
+type EmailMessageProps = {
   message: gmail_v1.Schema$Message;
 };
 
-export function EmailMessagePreview({ message }: EmailMessagePreviewProps) {
+export function EmailMessage({ message }: EmailMessageProps) {
   const { html, text, headers } = decodePayload(message.payload);
   const date = message.internalDate ? new Date(parseInt(message.internalDate)) : null;
   const dateString = date?.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
@@ -27,7 +27,7 @@ export function EmailMessagePreview({ message }: EmailMessagePreviewProps) {
   const replyTo = headers["Reply-To"];
 
   return (
-    <div className="flex flex-col gap-4 p-4 outline outline-gray-200">
+    <div className="flex flex-col gap-2 p-2">
       <div className="flex justify-between">
         <div>
           <div>
@@ -49,7 +49,7 @@ export function EmailMessagePreview({ message }: EmailMessagePreviewProps) {
         </div>
         <div>{dateString}</div>
       </div>
-      <div dangerouslySetInnerHTML={{ __html: htmlToRender }} />
+      <div className="overflow-scroll" dangerouslySetInnerHTML={{ __html: htmlToRender }} />
     </div>
   );
 }
