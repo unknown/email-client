@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type EmailPreviewProps = {
   html: string | null;
@@ -15,17 +15,24 @@ export function EmailPreview({ html, text }: EmailPreviewProps) {
   const ref = useRef<HTMLIFrameElement>(null);
   const [height, setHeight] = useState("0px");
 
-  const onLoad = () => {
+  function resize() {
+    const document = ref.current?.contentWindow?.document;
+    if (!document) {
+      return;
+    }
+    const rect = document.documentElement.getBoundingClientRect();
+    setHeight(rect.height + "px");
+  }
+
+  function onLoad() {
     const document = ref.current?.contentWindow?.document;
     if (!document) {
       return;
     }
 
-    const body = document.body;
-    const html = document.documentElement;
-    const height = Math.max(body.scrollHeight, html.scrollHeight);
-    setHeight(height + 1 + "px");
+    resize();
 
+    const body = document.body;
     const stylesheet = document.createElement("style");
     stylesheet.innerHTML = iFrameBaseStyles;
     body.appendChild(stylesheet);
@@ -37,7 +44,14 @@ export function EmailPreview({ html, text }: EmailPreviewProps) {
         window.browser.openUrl(link.href);
       });
     }
-  };
+  }
+
+  useEffect(() => {
+    window.addEventListener("resize", resize);
+    return () => {
+      window.removeEventListener("resize", resize);
+    };
+  });
 
   let htmlToRender: string | null = null;
   if (html !== null) {
