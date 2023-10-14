@@ -7,6 +7,8 @@ const SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"];
 const TOKEN_PATH = path.join(process.cwd(), "token.json");
 const CREDENTIALS_PATH = path.join(process.cwd(), "credentials.json");
 
+let _gmailClient: gmail_v1.Gmail;
+
 async function loadSavedCredentialsIfExist() {
   try {
     const content = await fs.readFile(TOKEN_PATH, { encoding: "utf-8" });
@@ -45,6 +47,13 @@ export async function authorize() {
     await saveCredentials(client);
   }
   return client;
+}
+
+export async function getGmailClient() {
+  if (!_gmailClient) {
+    _gmailClient = await authorize().then(createGmailClient);
+  }
+  return _gmailClient;
 }
 
 export function createGmailClient(auth: Auth.OAuth2Client) {

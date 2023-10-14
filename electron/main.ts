@@ -1,33 +1,7 @@
 import path from "node:path";
 import { app, BrowserWindow, ipcMain } from "electron";
-import { gmail_v1 } from "googleapis";
 
-import * as gmailUtils from "./utils/gmail";
-
-let _gmailClient: gmail_v1.Gmail;
-
-async function getGmailClient() {
-  if (!_gmailClient) {
-    _gmailClient = await gmailUtils.authorize().then(gmailUtils.createGmailClient);
-  }
-  return _gmailClient;
-}
-
-async function listLabels() {
-  return getGmailClient().then(gmailUtils.listLabels).catch(console.error);
-}
-
-async function listThreads(labelIds: string[]) {
-  return getGmailClient()
-    .then((client) => gmailUtils.listThreads(client, labelIds))
-    .catch(console.error);
-}
-
-async function getThread(id: string) {
-  return getGmailClient()
-    .then((client) => gmailUtils.getThread(client, id))
-    .catch(console.error);
-}
+import { getGmailClient, getThread, listLabels, listThreads } from "./utils/gmail";
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -48,9 +22,19 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
-  ipcMain.handle("gmail/list-labels", listLabels);
-  ipcMain.handle("gmail/list-threads", async (_, labelIds) => listThreads(labelIds));
-  ipcMain.handle("gmail/get-thread", async (_, id) => getThread(id));
+  ipcMain.handle("gmail/list-labels", async function ipcListLabels() {
+    return getGmailClient().then(listLabels).catch(console.error);
+  });
+  ipcMain.handle("gmail/list-threads", async function ipcListThreads(_, labelIds) {
+    return getGmailClient()
+      .then((client) => listThreads(client, labelIds))
+      .catch(console.error);
+  });
+  ipcMain.handle("gmail/get-thread", async function ipcGetThread(_, id) {
+    return getGmailClient()
+      .then((client) => getThread(client, id))
+      .catch(console.error);
+  });
 
   createWindow();
 
