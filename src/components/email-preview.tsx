@@ -43,8 +43,7 @@ export function EmailPreview({ html, text }: EmailPreviewProps) {
   if (html !== null) {
     htmlToRender = html;
   } else if (text !== null) {
-    const textWithBr = text.replaceAll("\n", "<br />");
-    htmlToRender = textWithBr;
+    htmlToRender = text;
   } else {
     htmlToRender = "Email could not be decoded";
   }

@@ -17,6 +17,9 @@ dependencies:
   html-entities:
     specifier: ^2.4.0
     version: 2.4.0
+  linkify-html:
+    specifier: ^4.1.1
+    version: 4.1.1(linkifyjs@4.1.1)
   tailwind-merge:
     specifier: ^1.14.0
     version: 1.14.0
@@ -1604,6 +1607,18 @@ packages:
   /lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
     dev: true
+
+  /linkify-html@4.1.1(linkifyjs@4.1.1):
+    resolution: {integrity: sha512-7RcF7gIhEOGBBvs7orCJ2tevaz7iF0ZLZSRPWNNBOnW/uGjOOQYB+ztSeHF6dchMC2dM9H8zZlt6Z959bjteaw==}
+    peerDependencies:
+      linkifyjs: ^4.0.0
+    dependencies:
+      linkifyjs: 4.1.1
+    dev: false
+
+  /linkifyjs@4.1.1:
+    resolution: {integrity: sha512-zFN/CTVmbcVef+WaDXT63dNzzkfRBKT1j464NJQkV7iSgJU0sLBus9W0HBwnXK13/hf168pbrx/V/bjEHOXNHA==}
+    dev: false
 
   /loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
