@@ -22,9 +22,9 @@ function App() {
     };
   }, []);
 
-  async function updateThread(threadId: string) {
-    const thread = (await window.gmail.getThread(threadId)) ?? null;
-    setThread(thread);
+  async function updateThread({ id }: gmail_v1.Schema$Thread) {
+    const thread = id ? await window.gmail.getThread(id) : null;
+    setThread(thread ?? null);
   }
 
   return (

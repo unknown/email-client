@@ -1,37 +1,36 @@
 import { gmail_v1 } from "googleapis";
 import { useState } from "react";
-import { twMerge } from "tailwind-merge";
 
-import { decodeHtmlEntities } from "../utils/decoder";
+import { ThreadItem } from "./thread-item";
 
 type ThreadListProps = {
   threads: gmail_v1.Schema$Thread[] | null;
-  onThreadClick: (labelId: string) => void;
+  onThreadClick: (thread: gmail_v1.Schema$Thread) => void;
 };
 
-export function ThreadList({ threads, onThreadClick }: ThreadListProps) {
+export function ThreadList({ threads, onThreadClick: consumerOnThreadClick }: ThreadListProps) {
   const [selected, setSelected] = useState<number | null>(null);
 
   if (threads === null) {
-    return "Nothing selected";
+    return (
+      <div className="flex items-center">
+        <p className="w-full text-center">Failed to fetch emails</p>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col divide-y overflow-scroll p-2">
       {threads.map((thread, i) => (
-        <div
+        <ThreadItem
           key={thread.id ?? i}
-          className={twMerge(
-            "break-words px-4 py-2",
-            selected === i ? "bg-blue-500 text-white" : null,
-          )}
-          onClick={() => {
+          thread={thread}
+          onThreadClick={() => {
             setSelected(i);
-            onThreadClick(thread.id ?? "");
+            consumerOnThreadClick(thread);
           }}
-        >
-          <p>{decodeHtmlEntities(thread.snippet ?? "")}</p>
-        </div>
+          isSelected={i === selected}
+        />
       ))}
     </div>
   );
