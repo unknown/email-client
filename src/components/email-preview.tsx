@@ -27,7 +27,7 @@ export function EmailPreview({ message }: EmailPreviewProps) {
   const replyTo = headers["Reply-To"];
 
   return (
-    <div className="flex flex-col gap-4 outline p-4 outline-gray-200">
+    <div className="flex flex-col gap-4 p-4 outline outline-gray-200">
       <div className="flex justify-between">
         <div>
           <div>
