@@ -5,8 +5,13 @@ export interface IGmailAPI {
   getThread: (id: string) => Promise<Schema$Thread | undefined>;
 }
 
+export interface IBrowserAPI {
+  openUrl: (url: string) => Promise<void>;
+}
+
 declare global {
   interface Window {
     gmail: IGmailAPI;
+    browser: IBrowserAPI;
   }
 }

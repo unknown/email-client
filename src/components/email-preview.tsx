@@ -29,6 +29,15 @@ export function EmailPreview({ html, text }: EmailPreviewProps) {
     const stylesheet = document.createElement("style");
     stylesheet.innerHTML = iFrameBaseStyles;
     body.appendChild(stylesheet);
+
+    const links = document.getElementsByTagName("a");
+    for (const link of links) {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        console.log(link.href);
+        window.browser.openUrl(link.href);
+      });
+    }
   };
 
   let htmlToRender: string | null = null;
