@@ -1,10 +1,14 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-import { IGmailAPI } from "./renderer";
+import { IBrowserAPI, IGmailAPI } from "./renderer";
 
-const gmailAPI: IGmailAPI = {
+const gmailApi: IGmailAPI = {
   listInbox: () => ipcRenderer.invoke("gmail/list-inbox"),
   getThread: (id: string) => ipcRenderer.invoke("gmail/get-thread", id),
 };
+contextBridge.exposeInMainWorld("gmail", gmailApi);
 
-contextBridge.exposeInMainWorld("gmail", gmailAPI);
+const browserApi: IBrowserAPI = {
+  openUrl: (url: string) => ipcRenderer.invoke("browser/open-url", url),
+};
+contextBridge.exposeInMainWorld("browser", browserApi);

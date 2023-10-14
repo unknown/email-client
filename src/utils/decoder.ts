@@ -1,6 +1,7 @@
 import DOMPurify from "dompurify";
 import { gmail_v1 } from "googleapis";
 import { decode } from "html-entities";
+import linkifyHtml from "linkify-html";
 
 export function decodeHtmlEntities(str: string) {
   return decode(str);
@@ -49,6 +50,15 @@ function flattenParts(
   }
 }
 
+function convertTextToHtml(text: string | null) {
+  if (text === null) {
+    return null;
+  }
+  const textWithBr = text.replaceAll("\n", "<br />");
+  const textWithLinks = linkifyHtml(textWithBr);
+  return textWithLinks;
+}
+
 export type DecodedPayload = {
   html: string | null;
   text: string | null;
@@ -72,7 +82,8 @@ export function decodePayload(payload: gmail_v1.Schema$MessagePart | undefined) 
     decodedPayload.html = dirtyHtml ? DOMPurify.sanitize(dirtyHtml) : null;
   }
   if (typeof text?.body?.data == "string") {
-    decodedPayload.text = decodeBody(text.body.data);
+    const rawHtml = decodeBody(text.body.data);
+    decodedPayload.text = convertTextToHtml(rawHtml);
   }
 
   payload.headers?.map(({ name, value }) => {
