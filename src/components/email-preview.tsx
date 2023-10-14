@@ -34,7 +34,6 @@ export function EmailPreview({ html, text }: EmailPreviewProps) {
     for (const link of links) {
       link.addEventListener("click", (e) => {
         e.preventDefault();
-        console.log(link.href);
         window.browser.openUrl(link.href);
       });
     }
