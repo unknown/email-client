@@ -1,6 +1,7 @@
 import { gmail_v1 } from "googleapis";
 
 import { decodePayload } from "../utils/decoder";
+import { EmailPreview } from "./email-preview";
 
 type EmailMessageProps = {
   message: gmail_v1.Schema$Message;
@@ -10,20 +11,10 @@ export function EmailMessage({ message }: EmailMessageProps) {
   const { html, text, headers } = decodePayload(message.payload);
   const date = message.internalDate ? new Date(parseInt(message.internalDate)) : null;
 
-  let htmlToRender: string | null = null;
-  if (html !== null) {
-    htmlToRender = html;
-  } else if (text !== null) {
-    const textWithBr = text.replaceAll("\n", "<br />");
-    htmlToRender = textWithBr;
-  } else {
-    htmlToRender = "Email could not be decoded";
-  }
-
   return (
     <div className="flex flex-col gap-2 py-2">
       <EmailHeaders headers={headers} date={date} />
-      <div dangerouslySetInnerHTML={{ __html: htmlToRender }} />
+      <EmailPreview html={html} text={text} />
     </div>
   );
 }
