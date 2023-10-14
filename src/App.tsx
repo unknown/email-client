@@ -2,33 +2,25 @@ import { gmail_v1 } from "googleapis";
 import { useEffect, useState } from "react";
 
 import { EmailPreview } from "./components/email-preview";
-import { LabelList } from "./components/label-list";
 import { ThreadList } from "./components/thread-list";
 
 function App() {
-  const [labels, setLabels] = useState<gmail_v1.Schema$Label[] | null>(null);
   const [threads, setThreads] = useState<gmail_v1.Schema$Thread[] | null>(null);
   const [thread, setThread] = useState<gmail_v1.Schema$Thread | null>(null);
 
   useEffect(() => {
     let canceled = false;
-    async function loadLabels() {
-      const labels = (await window.gmail.listLabels()) ?? [];
+    async function loadInbox() {
+      const inbox = await window.gmail.listInbox();
       if (!canceled) {
-        setLabels(labels);
+        setThreads(inbox);
       }
     }
-    loadLabels();
+    loadInbox();
     return () => {
       canceled = true;
     };
   }, []);
-
-  async function updateThreads(labelId: string) {
-    const threads = (await window.gmail.listThreads([labelId])) ?? [];
-    setThreads(threads);
-    setThread(null);
-  }
 
   async function updateThread(threadId: string) {
     const thread = (await window.gmail.getThread(threadId)) ?? null;
@@ -38,18 +30,9 @@ function App() {
   return (
     <div className="space-y-3 p-4">
       <h1 className="text-lg underline">email client</h1>
-      <div className="flex gap-2">
-        <div>
-          <LabelList labels={labels} onLabelClick={updateThreads} />
-        </div>
-        <div className="flex-1">
-          <ThreadList threads={threads} onThreadClick={updateThread} />
-        </div>
-      </div>
-      <div className="flex flex-col gap-4">
-        {thread?.messages?.map((message, i) => {
-          return <EmailPreview key={message.id ?? i} message={message} />;
-        })}
+      <div className="grid grid-cols-2 gap-2">
+        <ThreadList threads={threads} onThreadClick={updateThread} />
+        <EmailPreview thread={thread} />
       </div>
     </div>
   );

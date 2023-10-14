@@ -1,9 +1,7 @@
-type Schema$Label = import("googleapis").gmail_v1.Schema$Label;
 type Schema$Thread = import("googleapis").gmail_v1.Schema$Thread;
 
 export interface IGmailAPI {
-  listLabels: () => Promise<Schema$Label[] | undefined>;
-  listThreads: (labelIds: string[]) => Promise<Schema$Thread[] | undefined>;
+  listInbox: () => Promise<Schema$Thread[]>;
   getThread: (id: string) => Promise<Schema$Thread | undefined>;
 }
 

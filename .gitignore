@@ -19,6 +19,7 @@ dist-electron/
 .DS_Store
 Thumbs.db
 
-# CREDENTIALS
+# LOCAL FILES
 credentials.json
 token.json
+inbox.json

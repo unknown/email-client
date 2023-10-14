@@ -34,7 +34,7 @@ async function saveCredentials(client: Auth.OAuth2Client) {
   await fs.writeFile(TOKEN_PATH, payload);
 }
 
-export async function authorize() {
+async function authorize() {
   let client: Auth.OAuth2Client | null = await loadSavedCredentialsIfExist();
   if (client) {
     return client;
@@ -49,38 +49,13 @@ export async function authorize() {
   return client;
 }
 
+function createGmailClient(auth: Auth.OAuth2Client) {
+  return google.gmail({ version: "v1", auth });
+}
+
 export async function getGmailClient() {
   if (!_gmailClient) {
     _gmailClient = await authorize().then(createGmailClient);
   }
   return _gmailClient;
-}
-
-export function createGmailClient(auth: Auth.OAuth2Client) {
-  return google.gmail({ version: "v1", auth });
-}
-
-export async function listLabels(gmail: gmail_v1.Gmail) {
-  const res = await gmail.users.labels.list({
-    userId: "me",
-  });
-  return res.data.labels;
-}
-
-export async function listThreads(gmail: gmail_v1.Gmail, labelIds: string[]) {
-  const res = await gmail.users.threads.list({
-    labelIds,
-    userId: "me",
-    maxResults: 5,
-  });
-  return res.data.threads;
-}
-
-export async function getThread(gmail: gmail_v1.Gmail, id: string) {
-  const res = await gmail.users.threads.get({
-    id,
-    userId: "me",
-    format: "full",
-  });
-  return res.data;
 }

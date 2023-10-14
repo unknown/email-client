@@ -1,7 +1,7 @@
 import path from "node:path";
 import { app, BrowserWindow, ipcMain } from "electron";
 
-import { getGmailClient, getThread, listLabels, listThreads } from "./utils/gmail";
+import { getThread, listInbox } from "./utils/gmail/api";
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -22,18 +22,11 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
-  ipcMain.handle("gmail/list-labels", async function ipcListLabels() {
-    return getGmailClient().then(listLabels).catch(console.error);
-  });
-  ipcMain.handle("gmail/list-threads", async function ipcListThreads(_, labelIds) {
-    return getGmailClient()
-      .then((client) => listThreads(client, labelIds))
-      .catch(console.error);
+  ipcMain.handle("gmail/list-inbox", async function ipcListInbox() {
+    return listInbox().catch(console.error);
   });
   ipcMain.handle("gmail/get-thread", async function ipcGetThread(_, id) {
-    return getGmailClient()
-      .then((client) => getThread(client, id))
-      .catch(console.error);
+    return getThread(id).catch(console.error);
   });
 
   createWindow();
