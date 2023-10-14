@@ -1,7 +1,10 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-contextBridge.exposeInMainWorld("gmail", {
-  listLabels: () => ipcRenderer.invoke("gmail/list-labels"),
-  listThreads: (labelIds: string[]) => ipcRenderer.invoke("gmail/list-threads", labelIds),
+import { IGmailAPI } from "./renderer";
+
+const gmailAPI: IGmailAPI = {
+  listInbox: () => ipcRenderer.invoke("gmail/list-inbox"),
   getThread: (id: string) => ipcRenderer.invoke("gmail/get-thread", id),
-});
+};
+
+contextBridge.exposeInMainWorld("gmail", gmailAPI);
