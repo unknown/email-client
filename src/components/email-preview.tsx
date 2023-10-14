@@ -5,6 +5,12 @@ type EmailPreviewProps = {
   text: string | null;
 };
 
+const iFrameBaseStyles = `\
+body {
+  margin: 0px;
+  font-family: 'Helvetica', 'Arial', sans-serif;
+}`;
+
 export function EmailPreview({ html, text }: EmailPreviewProps) {
   const ref = useRef<HTMLIFrameElement>(null);
   const [height, setHeight] = useState("0px");
@@ -14,10 +20,15 @@ export function EmailPreview({ html, text }: EmailPreviewProps) {
     if (!document) {
       return;
     }
+
     const body = document.body;
     const html = document.documentElement;
     const height = Math.max(body.scrollHeight, html.scrollHeight);
     setHeight(height + 1 + "px");
+
+    const stylesheet = document.createElement("style");
+    stylesheet.innerHTML = iFrameBaseStyles;
+    body.appendChild(stylesheet);
   };
 
   let htmlToRender: string | null = null;
