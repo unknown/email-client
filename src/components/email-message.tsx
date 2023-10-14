@@ -9,7 +9,6 @@ type EmailMessageProps = {
 export function EmailMessage({ message }: EmailMessageProps) {
   const { html, text, headers } = decodePayload(message.payload);
   const date = message.internalDate ? new Date(parseInt(message.internalDate)) : null;
-  const dateString = date?.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 
   let htmlToRender: string | null = null;
   if (html !== null) {
@@ -21,35 +20,48 @@ export function EmailMessage({ message }: EmailMessageProps) {
     htmlToRender = "Email could not be decoded";
   }
 
+  return (
+    <div className="flex flex-col gap-2 p-2">
+      <EmailHeaders headers={headers} date={date} />
+      <div className="overflow-scroll" dangerouslySetInnerHTML={{ __html: htmlToRender }} />
+    </div>
+  );
+}
+
+type EmailHeadersProps = {
+  headers: Record<string, string>;
+  date: Date | null;
+};
+
+function EmailHeaders({ headers, date }: EmailHeadersProps) {
+  const dateString = date?.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+
   const from = headers["From"];
   const to = headers["Delivered-To"] ?? headers["To"];
   const cc = headers["Cc"];
   const replyTo = headers["Reply-To"];
 
   return (
-    <div className="flex flex-col gap-2 p-2">
-      <div className="flex justify-between">
-        <div>
-          <div>
-            From: <span className="text-gray-600">{from}</span>
-          </div>
-          <div>
-            To: <span className="text-gray-600">{to}</span>
-          </div>
-          {cc && (
-            <div>
-              Cc: <span className="text-gray-600">{cc}</span>
-            </div>
-          )}
-          {replyTo && (
-            <div>
-              Reply To: <span className="text-gray-600">{replyTo}</span>
-            </div>
-          )}
-        </div>
-        <div>{dateString}</div>
+    <div className="flex flex-wrap justify-between gap-2 md:flex-nowrap">
+      <div className="min-w-0 break-words">
+        <p>
+          From: <span className="text-gray-500">{from}</span>
+        </p>
+        <p>
+          To: <span className="text-gray-500">{to}</span>
+        </p>
+        {cc && (
+          <p>
+            Cc: <span className="text-gray-500">{cc}</span>
+          </p>
+        )}
+        {replyTo && (
+          <p>
+            Reply To: <span className="text-gray-500">{replyTo}</span>
+          </p>
+        )}
       </div>
-      <div className="overflow-scroll" dangerouslySetInnerHTML={{ __html: htmlToRender }} />
+      <div className="text-right">{dateString}</div>
     </div>
   );
 }

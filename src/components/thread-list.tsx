@@ -22,7 +22,7 @@ export function ThreadList({ threads, onThreadClick }: ThreadListProps) {
         <div
           key={thread.id ?? i}
           className={twMerge(
-            "break-words rounded-md px-4 py-2",
+            "break-words px-4 py-2",
             selected === i ? "bg-blue-500 text-white" : null,
           )}
           onClick={() => {
