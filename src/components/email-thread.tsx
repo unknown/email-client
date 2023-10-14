@@ -22,9 +22,9 @@ export function EmailThread({ thread }: EmailThreadProps) {
     : null;
 
   return (
-    <div className="px-6 py-4">
+    <div className="overflow-scroll px-6 py-4">
       {subject && <h1 className="text-lg font-bold">{subject}</h1>}
-      <div className="flex flex-col divide-y overflow-scroll">
+      <div className="flex flex-col divide-y">
         {thread.messages?.map((message, i) => {
           return <EmailMessage key={message.id ?? i} message={message} />;
         })}
