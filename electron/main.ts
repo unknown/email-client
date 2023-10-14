@@ -1,5 +1,5 @@
 import path from "node:path";
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, shell } from "electron";
 
 import { getThread, listInbox } from "./utils/gmail/api";
 
@@ -19,6 +19,12 @@ const createWindow = () => {
     // TODO: fix this
     win.loadFile(path.join(__dirname, "../index.html"));
   }
+
+  // open all external URL links in user browser
+  win.webContents.on("will-navigate", (event) => {
+    event.preventDefault();
+    shell.openExternal(event.url);
+  });
 };
 
 app.whenReady().then(() => {
