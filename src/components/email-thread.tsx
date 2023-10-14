@@ -1,5 +1,6 @@
 import { gmail_v1 } from "googleapis";
 
+import { decodePayload } from "../utils/decoder";
 import { EmailMessage } from "./email-message";
 
 type EmailThreadProps = {
@@ -14,11 +15,20 @@ export function EmailThread({ thread }: EmailThreadProps) {
       </div>
     );
   }
+
+  const latestMessagePayload = thread.messages?.at(-1)?.payload;
+  const subject = latestMessagePayload
+    ? decodePayload(latestMessagePayload).headers["Subject"]
+    : null;
+
   return (
-    <div className="flex flex-col divide-y overflow-scroll px-4 py-2">
-      {thread.messages?.map((message, i) => {
-        return <EmailMessage key={message.id ?? i} message={message} />;
-      })}
+    <div className="px-6 py-4">
+      {subject && <h1 className="text-lg font-bold">{subject}</h1>}
+      <div className="flex flex-col divide-y overflow-scroll">
+        {thread.messages?.map((message, i) => {
+          return <EmailMessage key={message.id ?? i} message={message} />;
+        })}
+      </div>
     </div>
   );
 }

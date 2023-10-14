@@ -21,7 +21,7 @@ export function EmailMessage({ message }: EmailMessageProps) {
   }
 
   return (
-    <div className="flex flex-col gap-2 p-2">
+    <div className="flex flex-col gap-2 py-2">
       <EmailHeaders headers={headers} date={date} />
       <div className="overflow-scroll" dangerouslySetInnerHTML={{ __html: htmlToRender }} />
     </div>
