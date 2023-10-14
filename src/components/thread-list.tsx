@@ -1,5 +1,7 @@
 import { gmail_v1 } from "googleapis";
 
+import { decodeHtmlEntities } from "../utils/decoder";
+
 type ThreadListProps = {
   threads: gmail_v1.Schema$Thread[] | null;
   onThreadClick: (labelId: string) => void;
@@ -18,7 +20,7 @@ export function ThreadList({ threads, onThreadClick }: ThreadListProps) {
     <div className="flex flex-col gap-3">
       {threads?.map((thread, i) => (
         <div key={thread.id ?? i} onClick={() => onThreadClick(thread.id ?? "")}>
-          <p>{thread.snippet}</p>
+          <p>{decodeHtmlEntities(thread.snippet ?? "")}</p>
         </div>
       ))}
     </div>

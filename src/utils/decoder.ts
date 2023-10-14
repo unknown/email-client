@@ -1,5 +1,10 @@
 import DOMPurify from "dompurify";
 import { gmail_v1 } from "googleapis";
+import { decode } from "html-entities";
+
+export function decodeHtmlEntities(str: string) {
+  return decode(str);
+}
 
 function decodeBase64(base64: string) {
   const text = atob(base64);
