@@ -82,8 +82,9 @@ export function decodePayload(payload: gmail_v1.Schema$MessagePart | undefined) 
     decodedPayload.html = dirtyHtml ? DOMPurify.sanitize(dirtyHtml) : null;
   }
   if (typeof text?.body?.data == "string") {
-    const rawHtml = decodeBody(text.body.data);
-    decodedPayload.text = convertTextToHtml(rawHtml);
+    const decodedBody = decodeBody(text.body.data);
+    const dirtyHtml = convertTextToHtml(decodedBody);
+    decodedPayload.text = dirtyHtml ? DOMPurify.sanitize(dirtyHtml) : null;
   }
 
   payload.headers?.map(({ name, value }) => {
