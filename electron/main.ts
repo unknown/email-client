@@ -1,7 +1,7 @@
 import path from "node:path";
 import electron, { app, BrowserWindow, ipcMain, shell } from "electron";
 
-import { getThread, listInbox } from "./utils/gmail/api";
+import { getThread, listInbox } from "./gmail/api";
 
 const createWindow = () => {
   const win = new BrowserWindow({

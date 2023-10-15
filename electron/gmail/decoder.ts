@@ -1,11 +1,8 @@
-import DOMPurify from "dompurify";
 import { gmail_v1 } from "googleapis";
 import { decode } from "html-entities";
 import linkifyHtml from "linkify-html";
 
-export function decodeHtmlEntities(str: string) {
-  return decode(str);
-}
+import { DecodedPayload, EmailMessage, EmailThread } from "./types";
 
 function decodeBase64(base64: string) {
   const text = atob(base64);
@@ -26,6 +23,10 @@ function decodeBody(body: string) {
     console.error(err);
     return null;
   }
+}
+
+function decodeHtmlEntities(str: string) {
+  return decode(str);
 }
 
 function flattenParts(
@@ -59,40 +60,53 @@ function convertTextToHtml(text: string | null) {
   return textWithLinks;
 }
 
-export type DecodedPayload = {
-  html: string | null;
-  text: string | null;
-  headers: Record<string, string>;
-};
-
-export function decodePayload(payload: gmail_v1.Schema$MessagePart | undefined) {
+export function decodePayload(payload: gmail_v1.Schema$MessagePart) {
   const decodedPayload: DecodedPayload = { html: null, text: null, headers: {} };
-
-  if (!payload) {
-    return decodedPayload;
-  }
-
-  const flattened: gmail_v1.Schema$MessagePart[] = [];
-  flattenParts([payload], flattened);
-
-  const html = flattened.find((part) => part.mimeType === "text/html");
-  const text = flattened.find((part) => part.mimeType === "text/plain");
-  if (typeof html?.body?.data == "string") {
-    const dirtyHtml = decodeBody(html.body.data);
-    decodedPayload.html = dirtyHtml ? DOMPurify.sanitize(dirtyHtml) : null;
-  }
-  if (typeof text?.body?.data == "string") {
-    const decodedBody = decodeBody(text.body.data);
-    const dirtyHtml = convertTextToHtml(decodedBody);
-    decodedPayload.text = dirtyHtml ? DOMPurify.sanitize(dirtyHtml) : null;
-  }
-
-  payload.headers?.map(({ name, value }) => {
+  payload.headers?.forEach(({ name, value }) => {
     if (!name || !value) {
       return;
     }
     decodedPayload.headers[name] = value;
   });
 
+  const flattened: gmail_v1.Schema$MessagePart[] = [];
+  flattenParts([payload], flattened);
+
+  const html = flattened.find((part) => part.mimeType === "text/html");
+  const text = flattened.find((part) => part.mimeType === "text/plain");
+  if (typeof html?.body?.data === "string") {
+    const dirtyHtml = decodeBody(html.body.data);
+    decodedPayload.html = dirtyHtml;
+  }
+  if (typeof text?.body?.data === "string") {
+    const decodedBody = decodeBody(text.body.data);
+    const dirtyHtml = convertTextToHtml(decodedBody);
+    decodedPayload.text = dirtyHtml;
+  }
+
   return decodedPayload;
+}
+
+function decodeEmailMessage(message: gmail_v1.Schema$Message) {
+  const { historyId, id, internalDate, labelIds, payload, snippet, threadId } = message;
+  const decodedMessage: EmailMessage = {
+    historyId: historyId ?? null,
+    id: id ?? null,
+    internalDate: internalDate ?? null,
+    labelIds: labelIds ?? null,
+    decodedPayload: payload ? decodePayload(payload) : { html: null, text: null, headers: {} },
+    snippet: snippet ? decodeHtmlEntities(snippet) : null,
+    threadId: threadId ?? null,
+  };
+  return decodedMessage;
+}
+
+export function decodeEmailThread(thread: gmail_v1.Schema$Thread) {
+  const { historyId, id, messages } = thread;
+  const decodedThread: EmailThread = {
+    historyId: historyId ?? null,
+    id: id ?? null,
+    messages: messages?.map(decodeEmailMessage) ?? [],
+  };
+  return decodedThread;
 }

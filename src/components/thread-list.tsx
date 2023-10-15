@@ -1,11 +1,11 @@
-import { gmail_v1 } from "googleapis";
 import { useState } from "react";
 
+import { EmailThread } from "../../electron/gmail/types";
 import { ThreadItem } from "./thread-item";
 
 type ThreadListProps = {
-  threads: gmail_v1.Schema$Thread[] | null;
-  onThreadClick: (thread: gmail_v1.Schema$Thread) => void;
+  threads: EmailThread[] | null;
+  onThreadClick: (thread: EmailThread) => void;
 };
 
 export function ThreadList({ threads, onThreadClick: consumerOnThreadClick }: ThreadListProps) {
