@@ -1,7 +1,8 @@
 type Schema$Thread = import("googleapis").gmail_v1.Schema$Thread;
+type EmailThread = import("./gmail/types").EmailThread;
 
 export interface IGmailAPI {
-  listInbox: () => Promise<Schema$Thread[]>;
+  listInbox: () => Promise<EmailThread[]>;
   getThread: (id: string) => Promise<Schema$Thread | undefined>;
 }
 

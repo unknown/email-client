@@ -1,14 +1,12 @@
-import { gmail_v1 } from "googleapis";
-
-import { decodePayload } from "../utils/decoder";
+import { EmailMessage as EmailMessageType } from "../../electron/gmail/types";
 import { EmailPreview } from "./email-preview";
 
 type EmailMessageProps = {
-  message: gmail_v1.Schema$Message;
+  message: EmailMessageType;
 };
 
 export function EmailMessage({ message }: EmailMessageProps) {
-  const { html, text, headers } = decodePayload(message.payload);
+  const { html, text, headers } = message.decodedPayload;
   const date = message.internalDate ? new Date(parseInt(message.internalDate)) : null;
 
   return (

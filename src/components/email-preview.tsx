@@ -1,3 +1,5 @@
+import DOMPurify from "dompurify";
+
 type EmailPreviewProps = {
   html: string | null;
   text: string | null;
@@ -13,5 +15,10 @@ export function EmailPreview({ html, text }: EmailPreviewProps) {
     htmlToRender = "Email could not be decoded";
   }
 
-  return <div className="unpreflight" dangerouslySetInnerHTML={{ __html: htmlToRender }} />;
+  return (
+    <div
+      className="unpreflight"
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(htmlToRender) }}
+    />
+  );
 }

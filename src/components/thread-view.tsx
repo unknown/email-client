@@ -1,13 +1,11 @@
-import { gmail_v1 } from "googleapis";
-
-import { decodePayload } from "../utils/decoder";
+import { EmailThread } from "../../electron/gmail/types";
 import { EmailMessage } from "./email-message";
 
-type EmailThreadProps = {
-  thread: gmail_v1.Schema$Thread | null;
+type ThreadViewProps = {
+  thread: EmailThread | null;
 };
 
-export function EmailThread({ thread }: EmailThreadProps) {
+export function ThreadView({ thread }: ThreadViewProps) {
   if (!thread) {
     return (
       <div className="flex items-center">
@@ -16,10 +14,8 @@ export function EmailThread({ thread }: EmailThreadProps) {
     );
   }
 
-  const latestMessagePayload = thread.messages?.at(-1)?.payload;
-  const subject = latestMessagePayload
-    ? decodePayload(latestMessagePayload).headers["Subject"]
-    : null;
+  const latestMessage = thread.messages.at(-1);
+  const subject = latestMessage ? latestMessage.decodedPayload.headers["Subject"] : null;
 
   return (
     <div className="overflow-scroll px-6 py-4">
