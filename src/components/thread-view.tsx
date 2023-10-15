@@ -1,4 +1,4 @@
-import { EmailThread } from "../../electron/gmail/types";
+import { EmailThread } from "@/electron/gmail/types";
 import { EmailMessage } from "./email-message";
 
 type ThreadViewProps = {

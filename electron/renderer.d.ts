@@ -1,9 +1,6 @@
-type Schema$Thread = import("googleapis").gmail_v1.Schema$Thread;
-type EmailThread = import("./gmail/types").EmailThread;
-
 export interface IGmailAPI {
-  listInbox: () => Promise<EmailThread[]>;
-  getThread: (id: string) => Promise<Schema$Thread | undefined>;
+  listInbox: () => Promise<import("./gmail/types").EmailThread[]>;
+  getThread: (id: string) => Promise<import("googleapis").gmail_v1.Schema$Thread | undefined>;
 }
 
 export interface IBrowserAPI {

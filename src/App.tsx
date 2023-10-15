@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { EmailThread } from "../electron/gmail/types";
+import { EmailThread } from "@/electron/gmail/types";
 import { ThreadList } from "./components/thread-list";
 import { ThreadView } from "./components/thread-view";
 

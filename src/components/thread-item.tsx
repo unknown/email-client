@@ -1,6 +1,6 @@
 import { twMerge } from "tailwind-merge";
 
-import { EmailThread } from "../../electron/gmail/types";
+import { EmailThread } from "@/electron/gmail/types";
 
 type ThreadItemProps = {
   thread: EmailThread;

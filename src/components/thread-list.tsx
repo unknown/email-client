@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { EmailThread } from "../../electron/gmail/types";
+import { EmailThread } from "@/electron/gmail/types";
 import { ThreadItem } from "./thread-item";
 
 type ThreadListProps = {
