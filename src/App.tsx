@@ -28,7 +28,7 @@ function App() {
   }
 
   return (
-    <div className="flex max-h-screen flex-col gap-2">
+    <div className="flex h-screen flex-col gap-2">
       <div className="grid min-h-0 flex-1 flex-shrink grid-cols-[300px_1fr] divide-x">
         <ThreadList threads={threads} onThreadClick={updateThread} />
         <EmailThread thread={thread} />

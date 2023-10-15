@@ -13,5 +13,5 @@ export function EmailPreview({ html, text }: EmailPreviewProps) {
     htmlToRender = "Email could not be decoded";
   }
 
-  return <div className="email-preview" dangerouslySetInnerHTML={{ __html: htmlToRender }} />;
+  return <div className="unpreflight" dangerouslySetInnerHTML={{ __html: htmlToRender }} />;
 }

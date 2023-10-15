@@ -4,5 +4,5 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [require("./email-preflight.plugin.cjs")],
+  plugins: [require("./unpreflight.plugin.cjs")],
 };
