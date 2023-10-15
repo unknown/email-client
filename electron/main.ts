@@ -19,6 +19,15 @@ const createWindow = () => {
     // TODO: fix this
     win.loadFile(path.join(__dirname, "../index.html"));
   }
+
+  // open all external URL links in user browser
+  win.webContents.on("will-navigate", (event) => {
+    if (event.initiator?.url === event.url) {
+      return;
+    }
+    event.preventDefault();
+    shell.openExternal(event.url);
+  });
 };
 
 app.whenReady().then(() => {

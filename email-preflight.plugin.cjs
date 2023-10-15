@@ -8,7 +8,8 @@ module.exports = plugin(function ({ addBase }) {
   );
 
   preflightStyles.walkRules((rule) => {
-    rule.selector = `.email-preview ${rule.selector}`;
+    const selectors = rule.selector.split(",");
+    rule.selector = selectors.map((selector) => `.email-preview ${selector}`).join(",");
     rule.nodes.forEach((node, i) => {
       if (node.type == "decl") {
         rule.nodes[i].value = "revert";
