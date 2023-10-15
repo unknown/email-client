@@ -59,22 +59,25 @@ export async function listInbox() {
 
   const gmail = await getGmailClient();
   const threads: EmailThread[] = [];
-  let nextPageToken: string | null;
+  let nextPageToken: string | null = null;
 
   do {
     const res = await gmail.users.threads.list({
       labelIds: ["INBOX"],
+      pageToken: nextPageToken ?? undefined,
       maxResults: 20,
       userId: "me",
     });
-    res.data.threads?.forEach(async ({ id }) => {
-      if (id) {
-        const thread = await getThread(id);
-        threads.push(decodeEmailThread(thread));
-      }
-    });
-    nextPageToken = res.data.nextPageToken ?? null;
+    await Promise.all(
+      res.data.threads?.map(async ({ id }) => {
+        if (id) {
+          const thread = await getThread(id);
+          threads.push(decodeEmailThread(thread));
+        }
+      }) ?? [],
+    );
     console.log(threads.length);
+    nextPageToken = (res.data.nextPageToken ?? null) as string | null;
   } while (nextPageToken !== null && threads.length < 20);
 
   saveInbox(threads);
