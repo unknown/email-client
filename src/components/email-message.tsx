@@ -1,4 +1,4 @@
-import { EmailMessage as EmailMessageType } from "../../electron/gmail/types";
+import { EmailMessage as EmailMessageType } from "@/electron/gmail/types";
 import { EmailPreview } from "./email-preview";
 
 type EmailMessageProps = {
