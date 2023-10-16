@@ -8,13 +8,8 @@ module.exports = plugin(function ({ addBase, addUtilities }) {
   );
 
   preflightStyles.walkRules((rule) => {
-    rule.selectors = rule.selectors.map((selector) => `.unpreflight ${selector}`);
+    rule.selectors = rule.selectors.map((selector) => `${selector}:where(:not(.unpreflight *))`);
     rule.selector = rule.selectors.join(",");
-    rule.nodes.forEach((node, i) => {
-      if (node.type === "decl") {
-        rule.nodes[i].value = "revert";
-      }
-    });
   });
 
   addBase(preflightStyles.nodes);
