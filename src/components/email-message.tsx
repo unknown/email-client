@@ -34,23 +34,23 @@ function EmailHeaders({ headers, date }: EmailHeadersProps) {
     <div className="flex flex-wrap justify-between gap-2 md:flex-nowrap">
       <div className="min-w-0 break-words">
         <p>
-          From: <span className="text-gray-500">{from}</span>
+          From: <span className="text-tx-2">{from}</span>
         </p>
         <p>
-          To: <span className="text-gray-500">{to}</span>
+          To: <span className="text-tx-2">{to}</span>
         </p>
         {cc && (
           <p>
-            Cc: <span className="text-gray-500">{cc}</span>
+            Cc: <span className="text-tx-2">{cc}</span>
           </p>
         )}
         {replyTo && (
           <p>
-            Reply To: <span className="text-gray-500">{replyTo}</span>
+            Reply To: <span className="text-tx-2">{replyTo}</span>
           </p>
         )}
       </div>
-      <div className="text-right">{dateString}</div>
+      <div className="text-right text-tx-2">{dateString}</div>
     </div>
   );
 }

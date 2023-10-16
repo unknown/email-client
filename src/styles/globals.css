@@ -1,3 +1,56 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    /* white */
+    --color-bg: 255 255 255;
+    /* zinc-100 */
+    --color-bg-2: 244 244 245;
+
+    /* zinc-200 */
+    --color-ui: 228 228 231;
+    /* zinc-300 */
+    --color-ui-2: 212 212 216;
+    /* zinc-400 */
+    --color-ui-3: 161 161 170;
+
+    /* zinc-950 */
+    --color-tx: 9 9 11;
+    /* zinc-500 */
+    --color-tx-2: 113 113 122;
+    /* zinc-400 */
+    --color-tx-3: 161 161 170;
+  }
+
+  .dark {
+    /* zinc-950 */
+    --color-bg: 9 9 11;
+    /* zinc-900 */
+    --color-bg-2: 24 24 27;
+
+    /* zinc-800 */
+    --color-ui: 39 39 42;
+    /* zinc-700 */
+    --color-ui-2: 63 63 70;
+    /* zinc-600 */
+    --color-ui-3: 82 82 91;
+
+    /* zinc-200 */
+    --color-tx: 228 228 231;
+    /* zinc-300 */
+    --color-tx-2: 212 212 216;
+    /* zinc-400 */
+    --color-tx-3: 161 161 170;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-tx;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+}
