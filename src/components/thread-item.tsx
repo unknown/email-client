@@ -27,7 +27,7 @@ export function ThreadItem({ thread, isSelected, onThreadClick }: ThreadItemProp
       />
       <h2 className="truncate font-bold">{from}</h2>
       <h3 className="truncate font-medium">{subject}</h3>
-      <p className="truncate">{snippet}</p>
+      <p className={twMerge("truncate", !isSelected ? "text-tx-2" : null)}>{snippet}</p>
     </div>
   );
 }
