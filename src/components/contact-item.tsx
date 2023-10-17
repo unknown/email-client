@@ -7,10 +7,12 @@ type ContactItemProps = {
 
 export function ContactItem({ label, contact }: ContactItemProps) {
   const { name, email } = getNameAndEmail(contact);
+  const nameText = name ?? contact;
+
   if (!label) {
     return (
       <p className="font-bold" title={email}>
-        {name ?? contact}
+        {nameText}
       </p>
     );
   }
@@ -18,7 +20,7 @@ export function ContactItem({ label, contact }: ContactItemProps) {
     <p>
       {label}{" "}
       <span className="text-tx-2" title={email}>
-        {name ?? contact}
+        {nameText}
       </span>
     </p>
   );
