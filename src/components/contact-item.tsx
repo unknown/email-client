@@ -13,14 +13,13 @@ export function ContactItem({ label, contact }: ContactItemProps) {
         {name ?? contact}
       </p>
     );
-  } else {
-    return (
-      <p>
-        {label}{" "}
-        <span className="text-tx-2" title={email}>
-          {name ?? contact}
-        </span>
-      </p>
-    );
   }
+  return (
+    <p>
+      {label}{" "}
+      <span className="text-tx-2" title={email}>
+        {name ?? contact}
+      </span>
+    </p>
+  );
 }
