@@ -1,4 +1,5 @@
 import { rmSync } from "node:fs";
+import path from "path";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import electron from "vite-plugin-electron";
@@ -58,5 +59,11 @@ export default defineConfig(({ command }) => {
       // Use Node.js API in the Renderer-process
       renderer(),
     ],
+    resolve: {
+      alias: {
+        "@/electron": path.resolve(__dirname, "./electron"),
+        "@": path.resolve(__dirname, "./src"),
+      },
+    },
   };
 });

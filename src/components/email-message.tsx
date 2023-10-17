@@ -1,4 +1,5 @@
 import { EmailMessage as EmailMessageType } from "@/electron/gmail/types";
+import { ContactItem } from "./contact-item";
 import { EmailPreview } from "./email-preview";
 
 type EmailMessageProps = {
@@ -31,26 +32,14 @@ function EmailHeaders({ headers, date }: EmailHeadersProps) {
   const replyTo = headers["Reply-To"];
 
   return (
-    <div className="flex flex-wrap justify-between gap-2 md:flex-nowrap">
+    <div className="flex flex-wrap justify-between gap-2 text-sm md:flex-nowrap">
       <div className="min-w-0 break-words">
-        <p>
-          From: <span className="text-tx-2">{from}</span>
-        </p>
-        <p>
-          To: <span className="text-tx-2">{to}</span>
-        </p>
-        {cc && (
-          <p>
-            Cc: <span className="text-tx-2">{cc}</span>
-          </p>
-        )}
-        {replyTo && (
-          <p>
-            Reply To: <span className="text-tx-2">{replyTo}</span>
-          </p>
-        )}
+        {from && <ContactItem contact={from} />}
+        {to && <ContactItem label="To:" contact={to} />}
+        {cc && <ContactItem label="Cc:" contact={cc} />}
+        {replyTo && <ContactItem label="Reply To:" contact={replyTo} />}
       </div>
-      <div className="text-right text-tx-2">{dateString}</div>
+      <div className="flex-shrink-0 text-right text-tx-2">{dateString}</div>
     </div>
   );
 }
