@@ -68,15 +68,16 @@ export async function listInbox() {
       maxResults: 20,
       userId: "me",
     });
+    const newThreads: EmailThread[] = new Array(res.data.threads?.length);
     await Promise.all(
-      res.data.threads?.map(async ({ id }) => {
+      res.data.threads?.map(async ({ id }, i) => {
         if (id) {
           const thread = await getThread(id);
-          threads.push(decodeEmailThread(thread));
+          newThreads[i] = decodeEmailThread(thread);
         }
       }) ?? [],
     );
-    console.log(threads.length);
+    threads.push(...newThreads);
     nextPageToken = (res.data.nextPageToken ?? null) as string | null;
   } while (nextPageToken !== null && threads.length < 20);
 
