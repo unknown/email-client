@@ -1,6 +1,5 @@
 import { gmail_v1 } from "googleapis";
 import { decode } from "html-entities";
-import linkifyHtml from "linkify-html";
 
 import { DecodedPayload, EmailMessage, EmailThread } from "./types";
 
@@ -51,15 +50,6 @@ function flattenParts(
   }
 }
 
-function convertTextToHtml(text: string | null) {
-  if (text === null) {
-    return null;
-  }
-  const textWithBr = text.replaceAll("\n", "<br />");
-  const textWithLinks = linkifyHtml(textWithBr);
-  return textWithLinks;
-}
-
 export function decodePayload(payload: gmail_v1.Schema$MessagePart) {
   const decodedPayload: DecodedPayload = { html: null, text: null, headers: {} };
   payload.headers?.forEach(({ name, value }) => {
@@ -75,13 +65,12 @@ export function decodePayload(payload: gmail_v1.Schema$MessagePart) {
   const html = flattened.find((part) => part.mimeType === "text/html");
   const text = flattened.find((part) => part.mimeType === "text/plain");
   if (typeof html?.body?.data === "string") {
-    const dirtyHtml = decodeBody(html.body.data);
-    decodedPayload.html = dirtyHtml;
+    const decodedHtml = decodeBody(html.body.data);
+    decodedPayload.html = decodedHtml;
   }
   if (typeof text?.body?.data === "string") {
-    const decodedBody = decodeBody(text.body.data);
-    const dirtyHtml = convertTextToHtml(decodedBody);
-    decodedPayload.text = dirtyHtml;
+    const decodedText = decodeBody(text.body.data);
+    decodedPayload.text = decodedText;
   }
 
   return decodedPayload;
