@@ -34,7 +34,7 @@ export function ThreadView({ thread }: ThreadViewProps) {
   return (
     <div className="flex flex-col gap-2 overflow-scroll px-6 py-4">
       {subject && <h1 className="text-lg font-bold">{subject}</h1>}
-      <div className="flex flex-wrap items-center justify-center gap-3 rounded-md bg-purple-50 px-4 py-2 sm:flex-nowrap sm:justify-normal">
+      <div className="flex flex-wrap items-center justify-center gap-4 rounded-md bg-purple-50 px-4 py-2 sm:flex-nowrap sm:justify-normal">
         {summary ? (
           <div>{summary}</div>
         ) : (
@@ -49,7 +49,7 @@ export function ThreadView({ thread }: ThreadViewProps) {
                 console.log(response);
               }}
               disabled={isLoading || summary !== null}
-              className="rounded-md bg-purple-100 px-3 py-2 text-sm"
+              className="rounded-full bg-purple-200 px-4 py-2 text-sm"
             >
               Generate
             </button>
