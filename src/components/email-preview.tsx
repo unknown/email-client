@@ -1,5 +1,7 @@
 import DOMPurify from "dompurify";
 
+import { convertTextToHtml } from "@/utils/email";
+
 type EmailPreviewProps = {
   html: string | null;
   text: string | null;
@@ -10,7 +12,7 @@ export function EmailPreview({ html, text }: EmailPreviewProps) {
   if (html !== null) {
     htmlToRender = html;
   } else if (text !== null) {
-    htmlToRender = text;
+    htmlToRender = convertTextToHtml(text);
   } else {
     htmlToRender = "Email could not be decoded";
   }

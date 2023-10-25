@@ -12,6 +12,7 @@
     "googleapis": "^105.0.0",
     "html-entities": "^2.4.0",
     "linkify-html": "^4.1.1",
+    "openai": "^4.12.4",
     "tailwind-merge": "^1.14.0"
   },
   "devDependencies": {
