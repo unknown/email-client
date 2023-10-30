@@ -3,6 +3,7 @@ import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { EmailMessage as EmailMessageType } from "@/electron/gmail/types";
+import { formatDate } from "@/utils/date";
 import { convertTextToHtml } from "@/utils/email";
 import { ContactItem } from "./contact-item";
 
@@ -43,7 +44,11 @@ function EmailHeaders({ message, isCollapsed, onClick }: EmailHeadersProps) {
   const replyTo = headers["Reply-To"];
 
   const date = message.internalDate ? new Date(parseInt(message.internalDate)) : null;
-  const dateString = date?.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  const dateString = formatDate(date, {
+    dateStyle: "relative",
+    timeStyle: "short",
+    relativeDateFallback: "short",
+  });
 
   return (
     <div

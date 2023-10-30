@@ -1,6 +1,7 @@
 import { twMerge } from "tailwind-merge";
 
 import { EmailThread } from "@/electron/gmail/types";
+import { formatDate, isDateToday } from "@/utils/date";
 import { getNameAndEmail } from "@/utils/email";
 
 type ThreadItemProps = {
@@ -10,11 +11,20 @@ type ThreadItemProps = {
 };
 
 export function ThreadItem({ thread, isSelected, onThreadClick }: ThreadItemProps) {
-  const lastMessage = thread.messages?.at(-1);
   const senders = thread.messages.map((message) => message.decodedPayload.headers["From"]);
+  const numMessages = thread.messages.length;
+
+  const lastMessage = thread.messages.at(-1);
   const subject = lastMessage?.decodedPayload.headers["Subject"];
   const snippet = lastMessage?.snippet;
   const isUnread = lastMessage?.labelIds?.includes("UNREAD");
+
+  const date = lastMessage?.internalDate ? new Date(parseInt(lastMessage.internalDate)) : null;
+  const dateString = formatDate(date, {
+    dateStyle: isDateToday(date) ? undefined : "relative",
+    timeStyle: isDateToday(date) ? "short" : undefined,
+    relativeDateFallback: "short",
+  });
 
   const uniqueSenders = [...new Set(senders)];
   const sendersText = uniqueSenders
@@ -41,7 +51,17 @@ export function ThreadItem({ thread, isSelected, onThreadClick }: ThreadItemProp
         )}
       </div>
       <div className="min-w-0">
-        <h2 className="truncate font-bold">{sendersText}</h2>
+        <div className="flex gap-2">
+          <h2 className="truncate font-bold">{sendersText}</h2>
+          {numMessages > 1 && (
+            <span className={twMerge("flex-shrink-0", !isSelected ? "text-tx-2" : null)}>
+              {numMessages}
+            </span>
+          )}
+          <span className={twMerge("ml-auto flex-shrink-0", !isSelected ? "text-tx-2" : null)}>
+            {dateString}
+          </span>
+        </div>
         <h3 className="truncate font-medium">{subject}</h3>
         <p className={twMerge("truncate", !isSelected ? "text-tx-2" : null)}>{snippet}</p>
       </div>
