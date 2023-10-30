@@ -17,20 +17,12 @@ export function EmailMessage({ message, isCollapsible }: EmailMessageProps) {
   return (
     <div
       className={twMerge("flex flex-col gap-2 py-2", isCollapsed && "hover:cursor-pointer")}
-      onClick={() => {
-        if (isCollapsible && isCollapsed) {
-          setIsCollapsed(false);
-        }
-      }}
+      onClick={isCollapsible && isCollapsed ? () => setIsCollapsed(false) : undefined}
     >
       <EmailHeaders
         message={message}
         isCollapsed={isCollapsible ? isCollapsed : null}
-        onClick={() => {
-          if (isCollapsible && !isCollapsed) {
-            setIsCollapsed(true);
-          }
-        }}
+        onClick={isCollapsible && !isCollapsed ? () => setIsCollapsed(true) : undefined}
       />
       <EmailPreview message={message} isCollapsed={isCollapsed} />
     </div>
@@ -40,7 +32,7 @@ export function EmailMessage({ message, isCollapsible }: EmailMessageProps) {
 type EmailHeadersProps = {
   message: EmailMessageType;
   isCollapsed: boolean | null;
-  onClick: () => void;
+  onClick: (() => void) | undefined;
 };
 
 function EmailHeaders({ message, isCollapsed, onClick }: EmailHeadersProps) {
