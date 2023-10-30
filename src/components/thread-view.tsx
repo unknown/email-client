@@ -58,7 +58,8 @@ export function ThreadView({ thread }: ThreadViewProps) {
       </div>
       <div className="flex flex-col divide-y">
         {thread.messages?.map((message, i) => {
-          return <EmailMessage key={message.id ?? i} message={message} />;
+          const isLast = i === thread.messages.length - 1;
+          return <EmailMessage key={message.id ?? i} message={message} isCollapsible={!isLast} />;
         })}
       </div>
     </div>
