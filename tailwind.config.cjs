@@ -18,5 +18,5 @@ module.exports = {
   corePlugins: {
     preflight: false,
   },
-  plugins: [require("./unpreflight.plugin.cjs")],
+  plugins: [require("./unpreflight.plugin.cjs"), require("./animation-delay.plugin.cjs")],
 };
