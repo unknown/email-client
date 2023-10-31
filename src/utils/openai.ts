@@ -37,7 +37,7 @@ export function summarizeThread(thread: EmailThread) {
     });
   });
   const prompt = JSON.stringify({ subject, emailMessages });
-  console.log(prompt);
+
   return openai.chat.completions.create({
     messages: [
       {
@@ -51,5 +51,6 @@ export function summarizeThread(thread: EmailThread) {
       },
     ],
     model: "gpt-3.5-turbo",
+    stream: true,
   });
 }
