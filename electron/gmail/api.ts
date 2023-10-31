@@ -98,9 +98,18 @@ export async function listInbox() {
     return id2 - id1;
   });
 
+  const threadIds = new Set();
+  const uniqueThreads = threads.filter((thread) => {
+    if (threadIds.has(thread.id)) {
+      return false;
+    }
+    threadIds.add(thread.id);
+    return true;
+  });
+
   saveInbox({
     lastUpdated: beforeEpochSeconds,
-    threads,
+    threads: uniqueThreads,
   });
-  return threads;
+  return uniqueThreads;
 }
