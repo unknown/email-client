@@ -47,7 +47,7 @@ function EmailHeaders({ message, isCollapsed, onClick }: EmailHeadersProps) {
   const dateString = formatDate(date, {
     dateStyle: "relative",
     timeStyle: "short",
-    relativeDateFallback: "short",
+    relativeDateStyleFallback: "short",
   });
 
   return (
@@ -68,7 +68,7 @@ function EmailHeaders({ message, isCollapsed, onClick }: EmailHeadersProps) {
           </>
         )}
       </div>
-      <div className="flex-shrink-0 text-right text-tx-2">{dateString}</div>
+      <div className="text-tx-2 flex-shrink-0 text-right">{dateString}</div>
     </div>
   );
 }
@@ -83,7 +83,7 @@ export function EmailPreview({ message, isCollapsed }: EmailPreviewProps) {
   const snippet = message.snippet;
 
   if (isCollapsed) {
-    return <p className="truncate text-sm text-tx-2">{snippet}</p>;
+    return <p className="text-tx-2 truncate text-sm">{snippet}</p>;
   }
 
   let htmlToRender: string | null = null;

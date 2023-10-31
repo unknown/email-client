@@ -20,10 +20,12 @@ export function isDateYesterday(date: Date | null | undefined) {
   return areDatesOnSameDay(date, new Date(Date.now() - 24 * 60 * 60 * 1000));
 }
 
-type FormatDateOptions = Omit<Intl.DateTimeFormatOptions, "dateStyle"> & {
-  dateStyle: Intl.DateTimeFormatOptions["dateStyle"] | "relative";
-  relativeDateFallback?: Intl.DateTimeFormatOptions["dateStyle"];
-};
+type FormatDateOptions =
+  | Intl.DateTimeFormatOptions
+  | (Omit<Intl.DateTimeFormatOptions, "dateStyle"> & {
+      dateStyle: "relative";
+      relativeDateStyleFallback: Intl.DateTimeFormatOptions["dateStyle"];
+    });
 
 export function formatDate(date: Date | null | undefined, options?: FormatDateOptions) {
   if (!date) {
@@ -31,7 +33,7 @@ export function formatDate(date: Date | null | undefined, options?: FormatDateOp
   }
 
   if (options?.dateStyle === "relative") {
-    const { dateStyle, relativeDateFallback, ...rest } = options;
+    const { dateStyle, relativeDateStyleFallback, ...rest } = options;
     const formattedDate = date.toLocaleString(undefined, { ...rest, dateStyle: "medium" });
     const formattedOnlyDate = date.toLocaleDateString(undefined, { dateStyle: "medium" });
 
@@ -40,7 +42,7 @@ export function formatDate(date: Date | null | undefined, options?: FormatDateOp
     } else if (isDateYesterday(date)) {
       return formattedDate.replace(formattedOnlyDate, "Yesterday");
     } else {
-      return date.toLocaleString(undefined, { ...options, dateStyle: relativeDateFallback });
+      return date.toLocaleString(undefined, { ...options, dateStyle: relativeDateStyleFallback });
     }
   }
 

@@ -23,7 +23,7 @@ export function ThreadItem({ thread, isSelected, onThreadClick }: ThreadItemProp
   const dateString = formatDate(date, {
     dateStyle: isDateToday(date) ? undefined : "relative",
     timeStyle: isDateToday(date) ? "short" : undefined,
-    relativeDateFallback: "short",
+    relativeDateStyleFallback: "short",
   });
 
   const uniqueSenders = [...new Set(senders)];
