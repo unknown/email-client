@@ -1,7 +1,6 @@
 import OpenAI from "openai";
 
 import { EmailMessage, EmailThread } from "@/electron/gmail/types";
-import { getNameAndEmail } from "./email";
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -26,10 +25,9 @@ export function summarizeMessage(message: EmailMessage) {
 }
 
 export function summarizeThread(thread: EmailThread) {
-  const subject = thread.messages.at(0)?.decodedPayload.headers["Subject"];
+  const subject = thread.messages.at(-1)?.decodedPayload.headers["Subject"];
   const emailMessages = thread.messages.map(({ decodedPayload }) => {
-    const rawFrom = decodedPayload.headers["From"];
-    const from = rawFrom ? getNameAndEmail(rawFrom).name : null;
+    const from = decodedPayload.headers["From"];
     const message = decodedPayload.text ?? decodedPayload.html ?? "";
     return JSON.stringify({
       from,
