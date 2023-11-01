@@ -1,3 +1,4 @@
+import OpenAI from "openai";
 import { useState } from "react";
 
 import { EmailThread } from "@/electron/gmail/types";
@@ -39,17 +40,23 @@ export function ThreadView({ thread }: ThreadViewProps) {
         isLoading={isLoading}
         onGenerate={async () => {
           setIsLoading(true);
-          const stream = await summarizeThread(thread);
-          for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content ?? " ";
-            setSummary((prev) => {
-              if (prev === null) {
-                return content;
-              }
-              return prev + content;
-            });
-          }
+          const stream = await summarizeThread(thread).catch((err) => {
+            if (err instanceof OpenAI.APIError) {
+              setSummary(`OpenAI error: ${err.message}`);
+            } else {
+              setSummary(`Unexpected error: ${err}`);
+            }
+            console.error(err);
+            return null;
+          });
           setIsLoading(false);
+
+          if (stream !== null) {
+            for await (const chunk of stream) {
+              const content = chunk.choices[0]?.delta?.content ?? "";
+              setSummary((prev) => (prev ?? "") + content);
+            }
+          }
         }}
       />
       <div className="flex flex-col divide-y">
@@ -70,14 +77,14 @@ type GenerationBannerProps = {
 
 function GenerationBanner({ summary, isLoading, onGenerate }: GenerationBannerProps) {
   return (
-    <div className="rounded-md bg-purple-50 px-6 py-3">
+    <div className="break-words rounded-md bg-purple-50 px-6 py-3">
       {isLoading && summary === null && (
         <div className="space-y-1">
           <p>Generating...</p>
           <div className="flex max-w-lg flex-col gap-1.5">
             <div className="h-4 w-full animate-pulse rounded-md bg-purple-200" />
-            <div className="animation-delay-150 h-4 w-full animate-pulse rounded-md bg-purple-200" />
-            <div className="animation-delay-300 h-4 w-full animate-pulse rounded-md bg-purple-200" />
+            <div className="h-4 w-full animate-pulse rounded-md bg-purple-200 animation-delay-150" />
+            <div className="h-4 w-full animate-pulse rounded-md bg-purple-200 animation-delay-300" />
           </div>
         </div>
       )}
