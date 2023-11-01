@@ -12,7 +12,7 @@ function App() {
     let canceled = false;
     async function loadInbox() {
       const inbox = await window.gmail.listInbox();
-      if (!canceled && inbox) {
+      if (!canceled && inbox !== null) {
         setThreads(inbox);
       }
     }
@@ -29,7 +29,7 @@ function App() {
       return;
     }
 
-    const optimisticReadThread = {
+    const optimisticThread = {
       ...thread,
       messages: thread.messages.map((message) => {
         return {
@@ -38,13 +38,12 @@ function App() {
         };
       }),
     };
-    setThread(optimisticReadThread);
+    setThread(optimisticThread);
 
     const updatedThread = await window.gmail.modifyThread(thread.id, {
       removeLabelIds: ["UNREAD"],
     });
-
-    if (updatedThread) {
+    if (updatedThread !== null) {
       setThreads(
         (threads) => threads?.map((t) => (t.id === updatedThread.id ? updatedThread : t)) ?? null,
       );
