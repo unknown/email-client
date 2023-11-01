@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
+import { gmail_v1 } from "googleapis";
 
 import { IBrowserAPI, IGmailAPI } from "./renderer";
-import { gmail_v1 } from "googleapis";
 
 const gmailApi: IGmailAPI = {
   listInbox: () => ipcRenderer.invoke("gmail/list-inbox"),

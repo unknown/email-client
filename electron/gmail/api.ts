@@ -1,6 +1,6 @@
 import fs from "fs/promises";
-import { gmail_v1 } from "googleapis";
 import path from "node:path";
+import { gmail_v1 } from "googleapis";
 
 import { getGmailClient } from "./auth";
 import { decodeEmailThread } from "./decoder";
