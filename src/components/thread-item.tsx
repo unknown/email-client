@@ -17,7 +17,8 @@ export function ThreadItem({ thread, isSelected, onThreadClick }: ThreadItemProp
   const lastMessage = thread.messages.at(-1);
   const subject = lastMessage?.decodedPayload.headers["Subject"];
   const snippet = lastMessage?.snippet;
-  const isUnread = lastMessage?.labelIds?.includes("UNREAD");
+
+  const isUnread = thread.messages.some((message) => message.labelIds?.includes("UNREAD"));
 
   const date = lastMessage?.internalDate ? new Date(parseInt(lastMessage.internalDate)) : null;
   const dateString = formatDate(date, {
