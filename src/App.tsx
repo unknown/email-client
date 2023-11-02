@@ -34,22 +34,28 @@ function App() {
       messages: thread.messages.map((message) => {
         return {
           ...message,
-          labelIds: message.labelIds?.filter((label) => label !== "UNREAD") ?? [],
+          labelIds: message.labelIds?.filter((label) => label !== "UNREAD") ?? null,
         };
       }),
     };
+
+    // TODO: make these sync automatically???
+    setThreads(
+      (threads) =>
+        threads?.map((t) => (t.id === optimisticThread.id ? optimisticThread : t)) ?? null,
+    );
     setThread(optimisticThread);
 
     const updatedThread = await window.gmail.modifyThread(thread.id, {
       removeLabelIds: ["UNREAD"],
     });
-    if (updatedThread !== null) {
-      setThreads(
-        (threads) => threads?.map((t) => (t.id === updatedThread.id ? updatedThread : t)) ?? null,
-      );
-    } else {
-      setThread(thread);
-    }
+
+    const updatedOrFallbackThread = updatedThread ?? thread;
+    setThreads(
+      (threads) =>
+        threads?.map((t) => (t.id === updatedOrFallbackThread.id ? updatedOrFallbackThread : t)) ??
+        null,
+    );
   }
 
   return (
