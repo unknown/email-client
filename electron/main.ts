@@ -1,7 +1,7 @@
 import path from "node:path";
 import electron, { app, BrowserWindow, ipcMain, shell } from "electron";
 
-import { getThread, listInbox } from "./gmail/api";
+import { getThread, listInbox, modifyThread } from "./gmail/api";
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -32,10 +32,22 @@ const createWindow = () => {
 
 app.whenReady().then(() => {
   ipcMain.handle("gmail/list-inbox", async function ipcListInbox() {
-    return listInbox().catch(console.error);
+    return listInbox().catch((err) => {
+      console.error(err);
+      return null;
+    });
   });
   ipcMain.handle("gmail/get-thread", async function ipcGetThread(_, id) {
-    return getThread(id).catch(console.error);
+    return getThread(id).catch((err) => {
+      console.error(err);
+      return null;
+    });
+  });
+  ipcMain.handle("gmail/modify-thread", async function ipcModifyThread(_, id, options) {
+    return modifyThread(id, options).catch((err) => {
+      console.error(err);
+      return null;
+    });
   });
   ipcMain.handle("browser/open-url", async function ipcOpenUrl(_, url) {
     electron.shell.openExternal(url);

@@ -1,6 +1,10 @@
 export interface IGmailAPI {
-  listInbox: () => Promise<import("./gmail/types").EmailThread[]>;
-  getThread: (id: string) => Promise<import("googleapis").gmail_v1.Schema$Thread | undefined>;
+  listInbox: () => Promise<import("./gmail/types").EmailThread[] | null>;
+  getThread: (id: string) => Promise<import("./gmail/types").EmailThread | null>;
+  modifyThread: (
+    id: string,
+    options: import("googleapis").gmail_v1.Schema$ModifyThreadRequest,
+  ) => Promise<import("./gmail/types").EmailThread | null>;
 }
 
 export interface IBrowserAPI {

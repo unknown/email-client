@@ -1,29 +1,12 @@
 import fs from "fs/promises";
 import path from "node:path";
+import { gmail_v1 } from "googleapis";
 
 import { getGmailClient } from "./auth";
 import { decodeEmailThread } from "./decoder";
 import { EmailThread } from "./types";
 
 const INBOX_PATH = path.join(process.cwd(), "inbox.json");
-
-export async function listLabels() {
-  const gmail = await getGmailClient();
-  const res = await gmail.users.labels.list({
-    userId: "me",
-  });
-  return res.data.labels;
-}
-
-export async function listThreads(labelIds: string[]) {
-  const gmail = await getGmailClient();
-  const res = await gmail.users.threads.list({
-    labelIds,
-    userId: "me",
-    maxResults: 5,
-  });
-  return res.data.threads;
-}
 
 export async function getThread(id: string) {
   const gmail = await getGmailClient();
@@ -32,7 +15,21 @@ export async function getThread(id: string) {
     userId: "me",
     format: "full",
   });
-  return res.data;
+  return decodeEmailThread(res.data);
+}
+
+export async function modifyThread(
+  id: string,
+  options: gmail_v1.Schema$ModifyThreadRequest,
+): Promise<EmailThread> {
+  const gmail = await getGmailClient();
+  await gmail.users.threads.modify({
+    id,
+    userId: "me",
+    requestBody: options,
+  });
+  // TODO: save this
+  return getThread(id);
 }
 
 interface SavedInbox {
@@ -82,8 +79,7 @@ export async function listInbox() {
     const decodedThreads = await Promise.all(
       newThreads.map(async ({ id }) => {
         if (id) {
-          const thread = await getThread(id);
-          return decodeEmailThread(thread);
+          return await getThread(id);
         }
       }),
     );
