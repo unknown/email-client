@@ -22,16 +22,20 @@ function App() {
     };
   }, []);
 
-  async function updateThread(thread: EmailThread) {
-    const isUnread = thread?.messages.some((message) => message.labelIds?.includes("UNREAD"));
-    if (!isUnread || !thread.id) {
-      setThread(thread);
+  async function onThreadClick(newThread: EmailThread) {
+    if (newThread === thread) {
+      return;
+    }
+
+    const isUnread = newThread?.messages.some((message) => message.labelIds?.includes("UNREAD"));
+    if (!isUnread || !newThread.id) {
+      setThread(newThread);
       return;
     }
 
     const optimisticThread = {
-      ...thread,
-      messages: thread.messages.map((message) => {
+      ...newThread,
+      messages: newThread.messages.map((message) => {
         return {
           ...message,
           labelIds: message.labelIds?.filter((label) => label !== "UNREAD") ?? null,
@@ -46,11 +50,12 @@ function App() {
         threads?.map((t) => (t.id === optimisticThread.id ? optimisticThread : t)) ?? null,
     );
 
-    const updatedThread = await window.gmail.modifyThread(thread.id, {
+    const updatedThread = await window.gmail.modifyThread(newThread.id, {
       removeLabelIds: ["UNREAD"],
     });
+    const updatedOrFallbackThread = updatedThread ?? newThread;
 
-    const updatedOrFallbackThread = updatedThread ?? thread;
+    setThread(updatedOrFallbackThread);
     setThreads(
       (threads) =>
         threads?.map((t) => (t.id === updatedOrFallbackThread.id ? updatedOrFallbackThread : t)) ??
@@ -61,7 +66,7 @@ function App() {
   return (
     <div className="flex h-screen flex-col gap-2">
       <div className="grid min-h-0 flex-1 flex-shrink grid-cols-[300px_1fr] divide-x">
-        <ThreadList threads={threads} onThreadClick={updateThread} />
+        <ThreadList threads={threads} onThreadClick={onThreadClick} />
         <ThreadView key={thread?.id} thread={thread} />
       </div>
     </div>
