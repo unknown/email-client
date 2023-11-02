@@ -5,7 +5,8 @@
   "scripts": {
     "clean": "rm -rf node_modules dist",
     "dev": "vite",
-    "rebuild": "electron-rebuild -f -w better-sqlite3"
+    "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "db:push": "pnpm rebuild && drizzle-kit push:sqlite && pnpm run rebuild"
   },
   "dependencies": {
     "@google-cloud/local-auth": "^2.1.0",
