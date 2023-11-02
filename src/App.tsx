@@ -40,11 +40,11 @@ function App() {
     };
 
     // TODO: make these sync automatically???
+    setThread(optimisticThread);
     setThreads(
       (threads) =>
         threads?.map((t) => (t.id === optimisticThread.id ? optimisticThread : t)) ?? null,
     );
-    setThread(optimisticThread);
 
     const updatedThread = await window.gmail.modifyThread(thread.id, {
       removeLabelIds: ["UNREAD"],
