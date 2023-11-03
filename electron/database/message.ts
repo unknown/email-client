@@ -16,6 +16,7 @@ export async function insertMessage(message: EmailMessage, threadId: number) {
         threadId,
         historyId: message.historyId,
         serverId: message.id,
+        internalDate: message.internalDate,
         from: message.decodedPayload.headers["From"],
         to: message.decodedPayload.headers["To"],
         subject: message.decodedPayload.headers["Subject"],

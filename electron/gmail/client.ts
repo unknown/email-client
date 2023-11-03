@@ -17,8 +17,8 @@ export async function listThreads(): Promise<EmailThread[]> {
     // TODO fix these messages
     messages: thread.messages.map((message) => ({
       id: message.serverId,
-      historyId: null,
-      internalDate: null,
+      historyId: message.historyId,
+      internalDate: message.internalDate,
       labelIds: null,
       decodedPayload: {
         html: message.messageContents.bodyHtml,

@@ -17,6 +17,7 @@ export const messages = sqliteTable("messages", {
     .references(() => threads.id, { onDelete: "cascade" }),
   serverId: text("serverId").unique(),
   historyId: text("historyId"),
+  internalDate: text("internalDate"),
   from: text("from"),
   to: text("to"),
   subject: text("subject"),
