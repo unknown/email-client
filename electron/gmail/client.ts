@@ -29,7 +29,7 @@ export async function listThreads(): Promise<EmailThread[]> {
           Subject: message.subject,
         },
       },
-      snippet: thread.messages.at(-1)?.snippet ?? null,
+      snippet: message.snippet,
       threadId: thread.serverId,
     })),
   }));
