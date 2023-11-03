@@ -19,7 +19,7 @@ export async function listThreads(): Promise<EmailThread[]> {
       id: message.serverId,
       historyId: message.historyId,
       internalDate: message.internalDate,
-      labelIds: null,
+      labelIds: [message.isUnread && "UNREAD"].filter((label): label is string => label !== false),
       decodedPayload: {
         html: message.messageContents.bodyHtml,
         text: message.messageContents.bodyText,
