@@ -5,7 +5,7 @@ import { ThreadItem } from "./thread-item";
 
 type ThreadListProps = {
   threads: EmailThread[] | null;
-  onThreadClick: (thread: EmailThread) => void;
+  onThreadClick: (threadId: string | null) => void;
 };
 
 export function ThreadList({ threads, onThreadClick: consumerOnThreadClick }: ThreadListProps) {
@@ -27,7 +27,7 @@ export function ThreadList({ threads, onThreadClick: consumerOnThreadClick }: Th
           thread={thread}
           onThreadClick={() => {
             setSelected(i);
-            consumerOnThreadClick(thread);
+            consumerOnThreadClick(thread.id);
           }}
           isSelected={i === selected}
         />

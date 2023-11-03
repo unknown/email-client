@@ -22,15 +22,16 @@ function App() {
     };
   }, []);
 
-  async function onThreadClick(newThread: EmailThread) {
-    if (!newThread.id || thread?.id === newThread.id) {
+  async function onThreadClick(threadId: string | null) {
+    if (!threadId || thread?.id === threadId) {
       return;
     }
 
     // TODO: cache these retrieved threads?
-    const fullThread = await window.gmail.getThread(newThread.id);
+    const fullThread = await window.gmail.getThread(threadId);
+
     const isUnread = fullThread?.messages.some((message) => message.labelIds?.includes("UNREAD"));
-    if (!isUnread || !fullThread?.id) {
+    if (!fullThread?.id || !isUnread) {
       setThread(fullThread);
       return;
     }
