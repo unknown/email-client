@@ -21,8 +21,8 @@ export async function listThreads(): Promise<EmailThread[]> {
       internalDate: message.internalDate,
       labelIds: [message.isUnread && "UNREAD"].filter((label): label is string => label !== false),
       decodedPayload: {
-        html: message.messageContents.bodyHtml,
-        text: message.messageContents.bodyText,
+        html: null,
+        text: null,
         headers: {
           From: message.from,
           To: message.to,
@@ -43,28 +43,32 @@ export async function listThreads(): Promise<EmailThread[]> {
   return savedThreads;
 }
 
-export async function getMessageContents(threadId: string): Promise<EmailThread | null> {
+export async function getThread(threadId: string): Promise<EmailThread | null> {
   const thread = await getThreadWithFullMessages(threadId);
 
   if (!thread) {
     return null;
   }
 
+  // TODO: dedupe this code
   return {
     id: thread.serverId,
     historyId: null,
-    // TODO fix these messages
     messages: thread.messages.map((message) => ({
       id: message.serverId,
-      historyId: null,
-      internalDate: null,
-      labelIds: null,
+      historyId: message.historyId,
+      internalDate: message.internalDate,
+      labelIds: [message.isUnread && "UNREAD"].filter((label): label is string => label !== false),
       decodedPayload: {
         html: message.messageContents.bodyHtml,
         text: message.messageContents.bodyText,
-        headers: {},
+        headers: {
+          From: message.from,
+          To: message.to,
+          Subject: message.subject,
+        },
       },
-      snippet: thread.messages.at(-1)?.snippet ?? null,
+      snippet: message.snippet,
       threadId: thread.serverId,
     })),
   };

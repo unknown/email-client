@@ -23,19 +23,21 @@ function App() {
   }, []);
 
   async function onThreadClick(newThread: EmailThread) {
-    if (newThread === thread) {
+    if (!newThread.id || thread?.id === newThread.id) {
       return;
     }
 
-    const isUnread = newThread?.messages.some((message) => message.labelIds?.includes("UNREAD"));
-    if (!isUnread || !newThread.id) {
-      setThread(newThread);
+    // TODO: cache these retrieved threads?
+    const fullThread = await window.gmail.getThread(newThread.id);
+    const isUnread = fullThread?.messages.some((message) => message.labelIds?.includes("UNREAD"));
+    if (!isUnread || !fullThread?.id) {
+      setThread(fullThread);
       return;
     }
 
     const optimisticThread = {
-      ...newThread,
-      messages: newThread.messages.map((message) => {
+      ...fullThread,
+      messages: fullThread.messages.map((message) => {
         return {
           ...message,
           labelIds: message.labelIds?.filter((label) => label !== "UNREAD") ?? null,
@@ -50,10 +52,10 @@ function App() {
         threads?.map((t) => (t.id === optimisticThread.id ? optimisticThread : t)) ?? null,
     );
 
-    const updatedThread = await window.gmail.modifyThread(newThread.id, {
+    const updatedThread = await window.gmail.modifyThread(fullThread.id, {
       removeLabelIds: ["UNREAD"],
     });
-    const updatedOrFallbackThread = updatedThread ?? newThread;
+    const updatedOrFallbackThread = updatedThread ?? fullThread;
 
     setThread(updatedOrFallbackThread);
     setThreads(

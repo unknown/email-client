@@ -35,14 +35,8 @@ app.whenReady().then(() => {
   ipcMain.handle("gmail/list-inbox", async function ipcListInbox() {
     return client.listThreads();
   });
-  ipcMain.handle("gmail/get-messages", async function ipcGetMessageContents(_, threadId) {
-    return client.getMessageContents(threadId);
-  });
   ipcMain.handle("gmail/get-thread", async function ipcGetThread(_, id) {
-    return api.getThread(id).catch((err) => {
-      console.error(err);
-      return null;
-    });
+    return client.getThread(id);
   });
   ipcMain.handle("gmail/modify-thread", async function ipcModifyThread(_, id, options) {
     return api.modifyThread(id, options).catch((err) => {

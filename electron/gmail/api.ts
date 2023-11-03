@@ -4,6 +4,16 @@ import { getGmailClient } from "./auth";
 import { decodeEmailThread } from "./decoder";
 import { EmailThread } from "./types";
 
+async function getThread(id: string) {
+  const gmail = await getGmailClient();
+  const res = await gmail.users.threads.get({
+    id,
+    userId: "me",
+    format: "full",
+  });
+  return decodeEmailThread(res.data);
+}
+
 export async function listInboxThreads(maxThreads: number = 100): Promise<EmailThread[]> {
   const gmail = await getGmailClient();
   let nextPageToken: string | null = null;
@@ -35,16 +45,6 @@ export async function listInboxThreads(maxThreads: number = 100): Promise<EmailT
   }
 
   return threads;
-}
-
-export async function getThread(id: string) {
-  const gmail = await getGmailClient();
-  const res = await gmail.users.threads.get({
-    id,
-    userId: "me",
-    format: "full",
-  });
-  return decodeEmailThread(res.data);
 }
 
 export async function modifyThread(

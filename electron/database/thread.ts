@@ -8,9 +8,9 @@ import { threads as threadsTable } from "./schema";
 export type Thread = typeof threadsTable.$inferSelect;
 
 export function getAllThreads() {
-  // TODO: return partial threads
+  // TODO: order by last message date
   return db.query.threads.findMany({
-    with: { messages: { with: { messageContents: true } } },
+    with: { messages: true },
   });
 }
 
