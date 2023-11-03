@@ -3,7 +3,7 @@ import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const threads = sqliteTable("threads", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-  serverId: text("serverId").notNull(),
+  serverId: text("serverId").unique(),
 });
 
 export const threadsRelations = relations(threads, ({ many }) => ({
@@ -15,12 +15,13 @@ export const messages = sqliteTable("messages", {
   threadId: integer("threadId")
     .notNull()
     .references(() => threads.id, { onDelete: "cascade" }),
-  historyId: text("historyId").notNull(),
-  serverId: text("serverId").notNull(),
-  from: text("from").notNull(),
-  subject: text("subject").notNull(),
-  snippet: text("snippet").notNull(),
-  isUnread: integer("isUnread", { mode: "boolean" }).notNull(),
+  serverId: text("serverId").unique(),
+  historyId: text("historyId"),
+  from: text("from"),
+  to: text("to"),
+  subject: text("subject"),
+  snippet: text("snippet"),
+  isUnread: integer("isUnread", { mode: "boolean" }),
 });
 
 export const messagesRelations = relations(messages, ({ one }) => ({
@@ -40,5 +41,4 @@ export const messageContents = sqliteTable("messageContents", {
     }),
   bodyHtml: text("bodyHtml"),
   bodyText: text("bodyText"),
-  to: text("to").notNull(),
 });

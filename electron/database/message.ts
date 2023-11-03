@@ -8,43 +8,32 @@ export function getAllMessages() {
   return db.select().from(messagesTable).all();
 }
 
-type EmailMessageWithId = EmailMessage & { messageId: number };
-
-export async function insertMessageRecords(messages: EmailMessage[], threadId: number) {
-  const insertedMessages = await db
-    .insert(messagesTable)
-    .values(
-      messages.map((message) => ({
+export async function insertMessage(message: EmailMessage, threadId: number) {
+  await db.transaction(async (tx) => {
+    const insertedMessage = await db
+      .insert(messagesTable)
+      .values({
         threadId,
-        historyId: message.historyId ?? "",
-        serverId: message.id ?? "",
-        from: message.decodedPayload.headers["From"] ?? "",
-        subject: message.decodedPayload.headers.Subject ?? "",
-        snippet: message.snippet ?? "",
-        isUnread: message.labelIds?.includes("UNREAD") ?? false,
-      })),
-    )
-    .returning({ insertedId: messagesTable.id });
+        historyId: message.historyId,
+        serverId: message.id,
+        from: message.decodedPayload.headers["From"],
+        to: message.decodedPayload.headers["To"],
+        subject: message.decodedPayload.headers["Subject"],
+        snippet: message.snippet,
+        isUnread: message.labelIds?.includes("UNREAD"),
+      })
+      .returning({ id: messagesTable.id });
 
-  const messagesWithIds = messages
-    .map((message, i) => ({
-      ...message,
-      messageId: insertedMessages[i]?.insertedId,
-    }))
-    .filter((message): message is EmailMessageWithId => message.messageId !== undefined);
+    const messageId = insertedMessage[0]?.id;
+    if (!messageId) {
+      tx.rollback();
+      return;
+    }
 
-  return messages.length === messagesWithIds.length ? messagesWithIds : null;
-}
-
-export async function insertMessageContentRecords(messages: EmailMessageWithId[]) {
-  await db.insert(messageContentsTable).values(
-    messages.map((message) => {
-      return {
-        messageId: message.messageId,
-        bodyHtml: message.decodedPayload.html ?? "",
-        bodyText: message.decodedPayload.text ?? "",
-        to: message.decodedPayload.headers["To"] ?? "",
-      };
-    }),
-  );
+    await db.insert(messageContentsTable).values({
+      messageId,
+      bodyHtml: message.decodedPayload.html,
+      bodyText: message.decodedPayload.text,
+    });
+  });
 }

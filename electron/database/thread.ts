@@ -2,14 +2,15 @@ import { eq } from "drizzle-orm";
 
 import { EmailThread } from "../gmail/types";
 import { db } from "./db";
-import { insertMessageContentRecords, insertMessageRecords } from "./message";
+import { insertMessage } from "./message";
 import { threads as threadsTable } from "./schema";
 
 export type Thread = typeof threadsTable.$inferSelect;
 
 export function getAllThreads() {
+  // TODO: return partial threads
   return db.query.threads.findMany({
-    with: { messages: true },
+    with: { messages: { with: { messageContents: true } } },
   });
 }
 
@@ -24,33 +25,24 @@ export async function getThreadWithFullMessages(threadId: string) {
   });
 }
 
-export async function insertThreadRecord(thread: EmailThread) {
-  if (!thread.id) {
-    return null;
-  }
-
-  const insertedThread = await db
-    .insert(threadsTable)
-    .values({ serverId: thread.id })
-    .returning({ insertedId: threadsTable.id });
-
-  return insertedThread[0]?.insertedId ?? null;
-}
-
 export async function insertThread(thread: EmailThread) {
   return db.transaction(async (tx) => {
-    const insertedThreadId = await insertThreadRecord(thread);
-    if (insertedThreadId === null) {
+    const insertedThread = await db
+      .insert(threadsTable)
+      .values({
+        serverId: thread.id,
+      })
+      .returning({ id: threadsTable.id });
+
+    const threadId = insertedThread[0]?.id;
+
+    if (!threadId) {
       tx.rollback();
       return;
     }
 
-    const messagesWithIds = await insertMessageRecords(thread.messages, insertedThreadId);
-    if (messagesWithIds === null) {
-      tx.rollback();
-      return;
+    for (const message of thread.messages) {
+      await insertMessage(message, threadId);
     }
-
-    await insertMessageContentRecords(messagesWithIds);
   });
 }

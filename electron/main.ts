@@ -1,8 +1,8 @@
 import path from "node:path";
 import electron, { app, BrowserWindow, ipcMain, shell } from "electron";
 
-import { getThread, modifyThread } from "./gmail/api";
-import { getMessageContents, listInboxThreads } from "./gmail/client";
+import * as api from "./gmail/api";
+import * as client from "./gmail/client";
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -33,19 +33,19 @@ const createWindow = () => {
 
 app.whenReady().then(() => {
   ipcMain.handle("gmail/list-inbox", async function ipcListInbox() {
-    return listInboxThreads();
+    return client.listThreads();
   });
   ipcMain.handle("gmail/get-messages", async function ipcGetMessageContents(_, threadId) {
-    return getMessageContents(threadId);
+    return client.getMessageContents(threadId);
   });
   ipcMain.handle("gmail/get-thread", async function ipcGetThread(_, id) {
-    return getThread(id).catch((err) => {
+    return api.getThread(id).catch((err) => {
       console.error(err);
       return null;
     });
   });
   ipcMain.handle("gmail/modify-thread", async function ipcModifyThread(_, id, options) {
-    return modifyThread(id, options).catch((err) => {
+    return api.modifyThread(id, options).catch((err) => {
       console.error(err);
       return null;
     });

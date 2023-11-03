@@ -1,10 +1,17 @@
-import { getAllThreads, getThreadWithFullMessages } from "../database/thread";
+import { getAllThreads, getThreadWithFullMessages, insertThread } from "../database/thread";
+import * as api from "./api";
 import { EmailThread } from "./types";
 
-export async function listInboxThreads(): Promise<EmailThread[]> {
-  const threads = await getAllThreads();
+async function fullSync() {
+  const threads = await api.listInboxThreads(20);
+  for (const thread of threads) {
+    await insertThread(thread);
+  }
+  return threads;
+}
 
-  return threads.map((thread) => ({
+export async function listThreads(): Promise<EmailThread[]> {
+  const savedThreads: EmailThread[] = (await getAllThreads()).map((thread) => ({
     id: thread.serverId,
     historyId: null,
     // TODO fix these messages
@@ -14,14 +21,26 @@ export async function listInboxThreads(): Promise<EmailThread[]> {
       internalDate: null,
       labelIds: null,
       decodedPayload: {
-        html: null,
-        text: null,
-        headers: {},
+        html: message.messageContents.bodyHtml,
+        text: message.messageContents.bodyText,
+        headers: {
+          From: message.from,
+          To: message.to,
+          Subject: message.subject,
+        },
       },
       snippet: thread.messages.at(-1)?.snippet ?? null,
       threadId: thread.serverId,
     })),
   }));
+
+  if (savedThreads.length === 0) {
+    return await fullSync();
+  }
+
+  // TODO: implement partial sync
+
+  return savedThreads;
 }
 
 export async function getMessageContents(threadId: string): Promise<EmailThread | null> {
