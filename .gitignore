@@ -23,3 +23,4 @@ Thumbs.db
 credentials.json
 token.json
 inbox.json
+db.sqlite

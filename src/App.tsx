@@ -22,25 +22,26 @@ function App() {
     };
   }, []);
 
-  async function onThreadClick(newThread: EmailThread) {
-    if (newThread === thread) {
+  async function onThreadClick(threadId: string | null) {
+    if (!threadId || thread?.id === threadId) {
       return;
     }
 
-    const isUnread = newThread?.messages.some((message) => message.labelIds?.includes("UNREAD"));
-    if (!isUnread || !newThread.id) {
-      setThread(newThread);
+    // TODO: cache these retrieved threads?
+    const fullThread = await window.gmail.getThread(threadId);
+
+    const isUnread = fullThread?.messages.some((message) => message.labelIds?.includes("UNREAD"));
+    if (!fullThread?.id || !isUnread) {
+      setThread(fullThread);
       return;
     }
 
     const optimisticThread = {
-      ...newThread,
-      messages: newThread.messages.map((message) => {
-        return {
-          ...message,
-          labelIds: message.labelIds?.filter((label) => label !== "UNREAD") ?? null,
-        };
-      }),
+      ...fullThread,
+      messages: fullThread.messages.map((message) => ({
+        ...message,
+        labelIds: message.labelIds?.filter((label) => label !== "UNREAD") ?? null,
+      })),
     };
 
     // TODO: make these sync automatically???
@@ -50,10 +51,10 @@ function App() {
         threads?.map((t) => (t.id === optimisticThread.id ? optimisticThread : t)) ?? null,
     );
 
-    const updatedThread = await window.gmail.modifyThread(newThread.id, {
+    const updatedThread = await window.gmail.modifyThread(fullThread.id, {
       removeLabelIds: ["UNREAD"],
     });
-    const updatedOrFallbackThread = updatedThread ?? newThread;
+    const updatedOrFallbackThread = updatedThread ?? fullThread;
 
     setThread(updatedOrFallbackThread);
     setThreads(
@@ -66,7 +67,11 @@ function App() {
   return (
     <div className="flex h-screen flex-col gap-2">
       <div className="grid min-h-0 flex-1 flex-shrink grid-cols-[300px_1fr] divide-x">
-        <ThreadList threads={threads} onThreadClick={onThreadClick} />
+        <ThreadList
+          threads={threads}
+          selectedThreadId={thread?.id ?? null}
+          onThreadClick={onThreadClick}
+        />
         <ThreadView key={thread?.id} thread={thread} />
       </div>
     </div>

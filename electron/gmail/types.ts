@@ -17,5 +17,5 @@ export type EmailThread = {
 export type DecodedPayload = {
   html: string | null;
   text: string | null;
-  headers: Record<string, string>;
+  headers: Record<string, string | null>;
 };

@@ -76,7 +76,7 @@ export function decodePayload(payload: gmail_v1.Schema$MessagePart) {
   return decodedPayload;
 }
 
-function decodeEmailMessage(message: gmail_v1.Schema$Message) {
+export function decodeEmailMessage(message: gmail_v1.Schema$Message) {
   const { historyId, id, internalDate, labelIds, payload, snippet, threadId } = message;
   const decodedMessage: EmailMessage = {
     historyId: historyId ?? null,
