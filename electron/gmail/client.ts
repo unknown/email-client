@@ -27,13 +27,13 @@ async function partialSync() {
 
   const { messagesAdded } = await api.getUpdates(mostRecentMessage.historyId);
   for (const message of messagesAdded) {
-    console.log(message.snippet);
     if (!message.threadId) {
       console.warn("message.threadId is null");
       continue;
     }
 
     const thread = await getThreadByServerId(message.threadId);
+
     if (!thread) {
       const newThread = await api.getThread(message.threadId);
       await insertThread(newThread);
@@ -48,15 +48,19 @@ async function partialSync() {
 
 export async function listThreads(): Promise<EmailThread[]> {
   // TODO: sync after returning original threads
-  const didPartialSync = await partialSync();
+  const didPartialSync = await partialSync().catch((err) => {
+    console.error("Partial sync failed", err);
+    return false;
+  });
   if (!didPartialSync) {
-    await fullSync();
+    await fullSync().catch((err) => {
+      console.error("Full sync failed", err);
+    });
   }
 
   const savedThreads: EmailThread[] = (await getAllThreads()).map((thread) => ({
     id: thread.serverId,
     historyId: thread.historyId,
-    // TODO fix these messages
     messages: thread.messages.map((message) => ({
       id: message.serverId,
       historyId: message.historyId,
