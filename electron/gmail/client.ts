@@ -46,19 +46,29 @@ async function partialSync() {
   return true;
 }
 
-export async function listThreads(): Promise<EmailThread[]> {
+export async function listThreads(): Promise<EmailThread[] | null> {
   // TODO: sync after returning original threads
   const didPartialSync = await partialSync().catch((err) => {
     console.error("Partial sync failed", err);
     return false;
   });
+
   if (!didPartialSync) {
     await fullSync().catch((err) => {
       console.error("Full sync failed", err);
     });
   }
 
-  const savedThreads: EmailThread[] = (await getAllThreads()).map((thread) => ({
+  const threads = await getAllThreads().catch((err) => {
+    console.error("Failed to get all threads", err);
+    return null;
+  });
+
+  if (!threads) {
+    return null;
+  }
+
+  const savedThreads: EmailThread[] = threads.map((thread) => ({
     id: thread.serverId,
     historyId: thread.historyId,
     messages: thread.messages.map((message) => ({
@@ -86,7 +96,10 @@ export async function listThreads(): Promise<EmailThread[]> {
 }
 
 export async function getThread(threadId: string): Promise<EmailThread | null> {
-  const thread = await getThreadWithFullMessages(threadId);
+  const thread = await getThreadWithFullMessages(threadId).catch((err) => {
+    console.error("Failed to get thread", err);
+    return null;
+  });
 
   if (!thread) {
     return null;
