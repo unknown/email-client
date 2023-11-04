@@ -19,16 +19,9 @@ async function fullSync() {
   }
 }
 
-async function partialSync() {
-  // TODO: use a different heuristic than the most recent message
-  // this is fine for now, because all our operations are idempotent
-  const mostRecentMessage = await getMostRecentMessage();
+async function partialSync(historyId: string) {
+  const { messagesAdded } = await api.getUpdates(historyId);
 
-  if (!mostRecentMessage?.historyId) {
-    return false;
-  }
-
-  const { messagesAdded } = await api.getUpdates(mostRecentMessage.historyId);
   for (const message of messagesAdded) {
     if (!message.threadId) {
       console.warn("message.threadId is null");
@@ -51,18 +44,19 @@ async function partialSync() {
       messages: [],
     });
   }
-
-  return true;
 }
 
 export async function listThreads(): Promise<EmailThread[] | null> {
   // TODO: sync after returning original threads
-  const didPartialSync = await partialSync().catch((err) => {
-    console.error("Partial sync failed", err);
-    return false;
-  });
+  // TODO: use a different heuristic than the most recent message
+  // this is fine for now because all our syncing operations are idempotent
+  const mostRecentMessage = await getMostRecentMessage();
 
-  if (!didPartialSync) {
+  if (mostRecentMessage?.historyId) {
+    await partialSync(mostRecentMessage.historyId).catch((err) => {
+      console.error("Partial sync failed", err);
+    });
+  } else {
     await fullSync().catch((err) => {
       console.error("Full sync failed", err);
     });
