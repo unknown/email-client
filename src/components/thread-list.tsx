@@ -1,16 +1,17 @@
-import { useState } from "react";
-
 import { EmailThread } from "@/electron/gmail/types";
 import { ThreadItem } from "./thread-item";
 
 type ThreadListProps = {
   threads: EmailThread[] | null;
+  selectedThreadId: string | null;
   onThreadClick: (threadId: string | null) => void;
 };
 
-export function ThreadList({ threads, onThreadClick: consumerOnThreadClick }: ThreadListProps) {
-  const [selected, setSelected] = useState<number | null>(null);
-
+export function ThreadList({
+  threads,
+  selectedThreadId,
+  onThreadClick: consumerOnThreadClick,
+}: ThreadListProps) {
   if (threads === null) {
     return (
       <div className="flex items-center">
@@ -26,10 +27,9 @@ export function ThreadList({ threads, onThreadClick: consumerOnThreadClick }: Th
           key={thread.id ?? i}
           thread={thread}
           onThreadClick={() => {
-            setSelected(i);
             consumerOnThreadClick(thread.id);
           }}
-          isSelected={i === selected}
+          isSelected={thread.id === selectedThreadId}
         />
       ))}
     </div>

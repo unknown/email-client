@@ -1,4 +1,4 @@
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 import { EmailMessage } from "../gmail/types";
 import { db } from "./db";
@@ -45,4 +45,15 @@ export async function insertMessage(message: EmailMessage, threadId: number) {
       bodyText: message.decodedPayload.text,
     });
   });
+}
+
+export async function updateMessage(message: EmailMessage) {
+  if (!message.id || !message.historyId) {
+    return;
+  }
+
+  await db
+    .update(messagesTable)
+    .set({ historyId: message.historyId, isUnread: message.labelIds?.includes("UNREAD") })
+    .where(eq(messagesTable.serverId, message.id));
 }

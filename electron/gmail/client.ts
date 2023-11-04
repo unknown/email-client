@@ -1,9 +1,12 @@
+import { gmail_v1 } from "googleapis";
+
 import { getMostRecentMessage, insertMessage } from "../database/message";
 import {
   getAllThreads,
   getThreadByServerId,
   getThreadWithFullMessages,
   insertThread,
+  updateThread,
 } from "../database/thread";
 import * as api from "./api";
 import { EmailThread } from "./types";
@@ -108,7 +111,7 @@ export async function getThread(threadId: string): Promise<EmailThread | null> {
   // TODO: dedupe this code
   return {
     id: thread.serverId,
-    historyId: null,
+    historyId: thread.historyId,
     messages: thread.messages.map((message) => ({
       id: message.serverId,
       historyId: message.historyId,
@@ -129,4 +132,28 @@ export async function getThread(threadId: string): Promise<EmailThread | null> {
       threadId: thread.serverId,
     })),
   };
+}
+
+export async function modifyThread(threadId: string, options: gmail_v1.Schema$ModifyThreadRequest) {
+  const thread = await api.modifyThread(threadId, options).catch((err) => {
+    console.error("Failed to modify thread", err);
+    return null;
+  });
+
+  if (!thread) {
+    return null;
+  }
+
+  const isUpdated = await updateThread(thread)
+    .then(() => true)
+    .catch((err) => {
+      console.error("Failed to update thread", err);
+      return false;
+    });
+
+  if (!isUpdated) {
+    return null;
+  }
+
+  return thread;
 }

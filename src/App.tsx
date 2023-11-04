@@ -38,12 +38,10 @@ function App() {
 
     const optimisticThread = {
       ...fullThread,
-      messages: fullThread.messages.map((message) => {
-        return {
-          ...message,
-          labelIds: message.labelIds?.filter((label) => label !== "UNREAD") ?? null,
-        };
-      }),
+      messages: fullThread.messages.map((message) => ({
+        ...message,
+        labelIds: message.labelIds?.filter((label) => label !== "UNREAD") ?? null,
+      })),
     };
 
     // TODO: make these sync automatically???
@@ -69,7 +67,11 @@ function App() {
   return (
     <div className="flex h-screen flex-col gap-2">
       <div className="grid min-h-0 flex-1 flex-shrink grid-cols-[300px_1fr] divide-x">
-        <ThreadList threads={threads} onThreadClick={onThreadClick} />
+        <ThreadList
+          threads={threads}
+          selectedThreadId={thread?.id ?? null}
+          onThreadClick={onThreadClick}
+        />
         <ThreadView key={thread?.id} thread={thread} />
       </div>
     </div>
