@@ -44,6 +44,12 @@ async function partialSync() {
     }
 
     await insertMessage(message, thread.id);
+    // TODO: verify updating thread historyId like this is ok
+    await updateThread({
+      id: thread.serverId,
+      historyId: message.historyId,
+      messages: [],
+    });
   }
 
   return true;
