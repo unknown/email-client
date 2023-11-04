@@ -4,6 +4,7 @@ import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 export const threads = sqliteTable("threads", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   serverId: text("serverId").unique(),
+  historyId: text("historyId"),
 });
 
 export const threadsRelations = relations(threads, ({ many }) => ({

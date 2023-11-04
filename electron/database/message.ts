@@ -1,3 +1,5 @@
+import { desc } from "drizzle-orm";
+
 import { EmailMessage } from "../gmail/types";
 import { db } from "./db";
 import { messageContents as messageContentsTable, messages as messagesTable } from "./schema";
@@ -6,6 +8,12 @@ export type Message = typeof messagesTable.$inferSelect;
 
 export function getAllMessages() {
   return db.select().from(messagesTable).all();
+}
+
+export function getMostRecentMessage() {
+  return db.query.messages.findFirst({
+    orderBy: [desc(messagesTable.historyId)],
+  });
 }
 
 export async function insertMessage(message: EmailMessage, threadId: number) {
