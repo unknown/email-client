@@ -18,5 +18,9 @@ module.exports = {
   corePlugins: {
     preflight: false,
   },
-  plugins: [require("./unpreflight.plugin.cjs"), require("./animation-delay.plugin.cjs")],
+  plugins: [
+    require("@tailwindcss/typography"),
+    require("./unpreflight.plugin.cjs"),
+    require("./animation-delay.plugin.cjs"),
+  ],
 };
