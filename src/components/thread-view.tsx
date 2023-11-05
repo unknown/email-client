@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { useState } from "react";
+import Markdown from "react-markdown";
 
 import { EmailThread } from "@/electron/gmail/types";
 import { summarizeThread } from "@/utils/openai";
@@ -46,7 +47,6 @@ export function ThreadView({ thread }: ThreadViewProps) {
             } else {
               setSummary(`Unexpected error: ${err}`);
             }
-            console.error(err);
             return null;
           });
           setIsLoading(false);
@@ -100,7 +100,7 @@ function GenerationBanner({ summary, isLoading, onGenerate }: GenerationBannerPr
           </button>
         </div>
       )}
-      {summary !== null && <p>{summary}</p>}
+      {summary !== null && <Markdown className="prose prose-neutral">{summary}</Markdown>}
     </div>
   );
 }

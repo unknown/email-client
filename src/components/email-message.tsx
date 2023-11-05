@@ -68,7 +68,7 @@ function EmailHeaders({ message, isCollapsed, onClick }: EmailHeadersProps) {
           </>
         )}
       </div>
-      <div className="text-tx-2 flex-shrink-0 text-right">{dateString}</div>
+      <div className="flex-shrink-0 text-right text-tx-2">{dateString}</div>
     </div>
   );
 }
@@ -83,7 +83,7 @@ export function EmailPreview({ message, isCollapsed }: EmailPreviewProps) {
   const snippet = message.snippet;
 
   if (isCollapsed) {
-    return <p className="text-tx-2 truncate text-sm">{snippet}</p>;
+    return <p className="truncate text-sm text-tx-2">{snippet}</p>;
   }
 
   let htmlToRender: string | null = null;
@@ -97,6 +97,7 @@ export function EmailPreview({ message, isCollapsed }: EmailPreviewProps) {
 
   return (
     <div
+      style={{ fontSize: "0.875rem" }}
       className="unpreflight"
       dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(htmlToRender) }}
     />
