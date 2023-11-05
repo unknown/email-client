@@ -5,6 +5,7 @@ export const threads = sqliteTable("threads", {
   id: integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
   serverId: text("serverId").unique(),
   historyId: text("historyId"),
+  latestMessageDate: text("latestMessageDate"),
 });
 
 export const threadsRelations = relations(threads, ({ many }) => ({

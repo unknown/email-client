@@ -8,15 +8,9 @@ import { threads as threadsTable } from "./schema";
 export type Thread = typeof threadsTable.$inferSelect;
 
 export async function getAllThreads() {
-  // TODO: add latest message date to threads table
-  const threads = (
-    await db.query.threads.findMany({
-      with: { messages: true },
-    })
-  ).sort((a, b) => {
-    const dateA = new Date(parseInt(a.messages.at(-1)?.internalDate ?? "0"));
-    const dateB = new Date(parseInt(b.messages.at(-1)?.internalDate ?? "0"));
-    return dateB.getTime() - dateA.getTime();
+  const threads = await db.query.threads.findMany({
+    with: { messages: true },
+    orderBy: (threads, { desc }) => desc(threads.latestMessageDate),
   });
 
   return threads;
@@ -46,6 +40,7 @@ export async function insertThread(thread: EmailThread) {
       .values({
         serverId: thread.id,
         historyId: thread.historyId,
+        latestMessageDate: thread.messages.at(-1)?.internalDate,
       })
       .returning({ id: threadsTable.id });
 
@@ -70,7 +65,10 @@ export async function updateThread(thread: EmailThread) {
 
     await db
       .update(threadsTable)
-      .set({ historyId: thread.historyId })
+      .set({
+        historyId: thread.historyId,
+        latestMessageDate: thread.messages.at(-1)?.internalDate,
+      })
       .where(eq(threadsTable.serverId, thread.id));
 
     for (const message of thread.messages) {
