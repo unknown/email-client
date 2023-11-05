@@ -7,8 +7,8 @@ import { threads as threadsTable } from "./schema";
 
 export type Thread = typeof threadsTable.$inferSelect;
 
-export async function getAllThreads() {
-  return await db.query.threads.findMany({
+export function getAllThreads() {
+  return db.query.threads.findMany({
     with: { messages: true },
     orderBy: [desc(threadsTable.latestMessageDate)],
   });
@@ -20,7 +20,7 @@ export function getThreadByServerId(serverId: string) {
   });
 }
 
-export async function getThreadWithFullMessages(serverId: string) {
+export function getThreadWithFullMessages(serverId: string) {
   return db.query.threads.findFirst({
     where: eq(threadsTable.serverId, serverId),
     with: {
@@ -31,7 +31,7 @@ export async function getThreadWithFullMessages(serverId: string) {
   });
 }
 
-export async function insertThread(thread: EmailThread) {
+export function insertThread(thread: EmailThread) {
   return db.transaction(async (tx) => {
     const insertedThread = await db
       .insert(threadsTable)
@@ -55,8 +55,8 @@ export async function insertThread(thread: EmailThread) {
   });
 }
 
-export async function updateThread(thread: EmailThread) {
-  await db.transaction(async (tx) => {
+export function updateThread(thread: EmailThread) {
+  return db.transaction(async (tx) => {
     if (!thread.id || !thread.historyId) {
       return;
     }

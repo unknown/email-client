@@ -16,8 +16,8 @@ export function getMostRecentMessage() {
   });
 }
 
-export async function insertMessage(message: EmailMessage, threadId: number) {
-  await db.transaction(async (tx) => {
+export function insertMessage(message: EmailMessage, threadId: number) {
+  return db.transaction(async (tx) => {
     const insertedMessage = await db
       .insert(messagesTable)
       .values({
@@ -47,12 +47,12 @@ export async function insertMessage(message: EmailMessage, threadId: number) {
   });
 }
 
-export async function updateMessage(message: EmailMessage) {
+export function updateMessage(message: EmailMessage) {
   if (!message.id || !message.historyId) {
     return;
   }
 
-  await db
+  return db
     .update(messagesTable)
     .set({ historyId: message.historyId, isUnread: message.labelIds?.includes("UNREAD") })
     .where(eq(messagesTable.serverId, message.id));
