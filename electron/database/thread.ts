@@ -10,7 +10,7 @@ export type Thread = typeof threadsTable.$inferSelect;
 export function getAllThreads() {
   return db.query.threads.findMany({
     with: { messages: true },
-    orderBy: [desc(threadsTable.historyId)],
+    orderBy: [desc(threadsTable.latestMessageDate)],
   });
 }
 
@@ -20,7 +20,7 @@ export function getThreadByServerId(serverId: string) {
   });
 }
 
-export async function getThreadWithFullMessages(serverId: string) {
+export function getThreadWithFullMessages(serverId: string) {
   return db.query.threads.findFirst({
     where: eq(threadsTable.serverId, serverId),
     with: {
@@ -31,13 +31,14 @@ export async function getThreadWithFullMessages(serverId: string) {
   });
 }
 
-export async function insertThread(thread: EmailThread) {
+export function insertThread(thread: EmailThread) {
   return db.transaction(async (tx) => {
     const insertedThread = await db
       .insert(threadsTable)
       .values({
         serverId: thread.id,
         historyId: thread.historyId,
+        latestMessageDate: thread.messages.at(-1)?.internalDate,
       })
       .returning({ id: threadsTable.id });
 
@@ -54,15 +55,18 @@ export async function insertThread(thread: EmailThread) {
   });
 }
 
-export async function updateThread(thread: EmailThread) {
-  await db.transaction(async (tx) => {
+export function updateThread(thread: EmailThread) {
+  return db.transaction(async (tx) => {
     if (!thread.id || !thread.historyId) {
       return;
     }
 
     await db
       .update(threadsTable)
-      .set({ historyId: thread.historyId })
+      .set({
+        historyId: thread.historyId,
+        latestMessageDate: thread.messages.at(-1)?.internalDate,
+      })
       .where(eq(threadsTable.serverId, thread.id));
 
     for (const message of thread.messages) {
