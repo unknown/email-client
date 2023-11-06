@@ -53,46 +53,41 @@ export function insertMessage(message: EmailMessage, threadId: number) {
   });
 }
 
-export function updateMessage(message: EmailMessage) {
-  if (!message.id || !message.historyId) {
-    return;
-  }
-
+export function updateMessageLabels(serverId: string, historyId: string, labelIds: string[]) {
   return db
     .update(messagesTable)
-    .set({ historyId: message.historyId, isUnread: message.labelIds?.includes("UNREAD") })
-    .where(eq(messagesTable.serverId, message.id));
-}
-
-export function updateMessageLabels(serverId: string, labelIds: string[]) {
-  return db
-    .update(messagesTable)
-    .set(getLabels(labelIds))
+    .set({ historyId, ...getLabels(labelIds) })
     .where(eq(messagesTable.serverId, serverId));
 }
 
-export function addMessageLabels(serverId: string, labelIds: string[]) {
+export function addMessageLabels(serverId: string, historyId: string, labelIds: string[]) {
   const labels = getLabels(labelIds);
 
-  const filtered: Partial<typeof labels> = {};
+  const filteredLabels: Partial<typeof labels> = {};
   for (const [key, value] of Object.entries(labels)) {
     if (value) {
-      filtered[key as keyof typeof labels] = true;
+      filteredLabels[key as keyof typeof labels] = true;
     }
   }
 
-  return db.update(messagesTable).set(filtered).where(eq(messagesTable.serverId, serverId));
+  return db
+    .update(messagesTable)
+    .set({ historyId, ...filteredLabels })
+    .where(eq(messagesTable.serverId, serverId));
 }
 
-export function removeMessageLabels(serverId: string, labelIds: string[]) {
+export function removeMessageLabels(serverId: string, historyId: string, labelIds: string[]) {
   const labels = getLabels(labelIds);
 
-  const filtered: Partial<typeof labels> = {};
+  const filteredLabels: Partial<typeof labels> = {};
   for (const [key, value] of Object.entries(labels)) {
     if (!value) {
-      filtered[key as keyof typeof labels] = false;
+      filteredLabels[key as keyof typeof labels] = false;
     }
   }
 
-  return db.update(messagesTable).set(filtered).where(eq(messagesTable.serverId, serverId));
+  return db
+    .update(messagesTable)
+    .set({ historyId, ...filteredLabels })
+    .where(eq(messagesTable.serverId, serverId));
 }

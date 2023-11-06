@@ -56,22 +56,24 @@ async function partialSync(historyId: string) {
 
     for (const labelAdded of update.labelsAdded ?? []) {
       const messageServerId = labelAdded.message?.id;
-      if (!messageServerId) {
-        console.warn("New message has a null id");
+      const messageHistoryId = labelAdded.message?.historyId;
+      if (!messageServerId || !messageHistoryId) {
+        console.warn("New message has a null id or historyId");
         continue;
       }
 
-      await addMessageLabels(messageServerId, labelAdded.labelIds ?? []);
+      await addMessageLabels(messageServerId, messageHistoryId, labelAdded.labelIds ?? []);
     }
 
     for (const labelRemoved of update.labelsRemoved ?? []) {
       const messageServerId = labelRemoved.message?.id;
-      if (!messageServerId) {
-        console.warn("New message has a null id");
+      const messageHistoryId = labelRemoved.message?.historyId;
+      if (!messageServerId || !messageHistoryId) {
+        console.warn("New message has a null id or historyId");
         continue;
       }
 
-      await removeMessageLabels(messageServerId, labelRemoved.labelIds ?? []);
+      await removeMessageLabels(messageServerId, messageHistoryId, labelRemoved.labelIds ?? []);
     }
   }
 }

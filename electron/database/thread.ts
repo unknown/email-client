@@ -2,7 +2,7 @@ import { desc, eq } from "drizzle-orm";
 
 import { EmailThread } from "../gmail/types";
 import { db } from "./db";
-import { insertMessage, updateMessage } from "./message";
+import { insertMessage, updateMessageLabels } from "./message";
 import { threads as threadsTable } from "./schema";
 
 export type Thread = typeof threadsTable.$inferSelect;
@@ -46,6 +46,7 @@ export function insertThread(thread: EmailThread) {
 
     if (!threadId) {
       tx.rollback();
+      // TODO: logging here?
       return;
     }
 
@@ -58,6 +59,7 @@ export function insertThread(thread: EmailThread) {
 export function updateThread(thread: EmailThread) {
   return db.transaction(async (tx) => {
     if (!thread.id || !thread.historyId) {
+      // TODO: logging here?
       return;
     }
 
@@ -71,11 +73,12 @@ export function updateThread(thread: EmailThread) {
 
     for (const message of thread.messages) {
       if (!message.id || !message.historyId) {
+        // TODO: logging here?
         tx.rollback();
         return;
       }
 
-      await updateMessage(message);
+      await updateMessageLabels(message.id, message.historyId, message.labelIds ?? []);
     }
   });
 }
