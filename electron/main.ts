@@ -3,8 +3,10 @@ import electron, { app, BrowserWindow, ipcMain, shell } from "electron";
 
 import * as client from "./gmail/client";
 
-const createWindow = () => {
-  const win = new BrowserWindow({
+let win: BrowserWindow | null = null;
+
+function createWindow() {
+  win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -28,9 +30,9 @@ const createWindow = () => {
     event.preventDefault();
     shell.openExternal(event.url);
   });
-};
+}
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   ipcMain.handle("gmail/list-inbox", async function ipcListInbox() {
     return client.listThreads();
   });
@@ -49,6 +51,15 @@ app.whenReady().then(() => {
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+
+  // TODO: create an onLoad callback instead of waiting
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  const needsSync = await client.sync();
+  if (needsSync) {
+    console.log("syncing");
+    win?.webContents.send("gmail/sync");
+  }
 });
 
 app.on("window-all-closed", () => {
