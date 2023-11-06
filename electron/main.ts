@@ -32,7 +32,7 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
   ipcMain.handle("gmail/list-inbox", async function ipcListInbox() {
     return client.listThreads();
   });
