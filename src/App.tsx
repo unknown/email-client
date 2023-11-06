@@ -18,18 +18,21 @@ function App() {
       }
     }
 
-    loadInbox();
-
-    // TODO: remove this listener when the component unmounts
-    window.gmail.onSync(() => {
-      if (!canceled) {
-        console.log("Syncing");
+    async function sync() {
+      const didSync = await window.gmail.sync();
+      if (didSync && !canceled) {
         loadInbox();
       }
-    });
+    }
+
+    loadInbox();
+    sync();
+
+    const syncInterval = setInterval(sync, 10 * 1000);
 
     return () => {
       canceled = true;
+      clearInterval(syncInterval);
     };
   }, []);
 

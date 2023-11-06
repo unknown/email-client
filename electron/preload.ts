@@ -8,7 +8,7 @@ const gmailApi: IGmailAPI = {
   getThread: (id: string) => ipcRenderer.invoke("gmail/get-thread", id),
   modifyThread: (id: string, options: gmail_v1.Schema$ModifyThreadRequest) =>
     ipcRenderer.invoke("gmail/modify-thread", id, options),
-  onSync: (callback: () => void) => ipcRenderer.on("gmail/sync", callback),
+  sync: () => ipcRenderer.invoke("gmail/sync"),
 };
 contextBridge.exposeInMainWorld("gmail", gmailApi);
 

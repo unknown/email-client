@@ -42,6 +42,9 @@ app.whenReady().then(async () => {
   ipcMain.handle("gmail/modify-thread", async function ipcModifyThread(_, id, options) {
     return client.modifyThread(id, options);
   });
+  ipcMain.handle("gmail/sync", async function ipcSync() {
+    return client.sync();
+  });
   ipcMain.handle("browser/open-url", async function ipcOpenUrl(_, url) {
     electron.shell.openExternal(url);
   });
@@ -51,15 +54,6 @@ app.whenReady().then(async () => {
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-
-  // TODO: pub/sub?
-  setInterval(async () => {
-    const didSync = await client.sync();
-    if (didSync) {
-      console.log("syncing");
-      win?.webContents.send("gmail/sync");
-    }
-  }, 5 * 1000);
 });
 
 app.on("window-all-closed", () => {
