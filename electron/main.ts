@@ -52,14 +52,14 @@ app.whenReady().then(async () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 
-  // TODO: create an onLoad callback instead of waiting
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-
-  const needsSync = await client.sync();
-  if (needsSync) {
-    console.log("syncing");
-    win?.webContents.send("gmail/sync");
-  }
+  // TODO: pub/sub?
+  setInterval(async () => {
+    const didSync = await client.sync();
+    if (didSync) {
+      console.log("syncing");
+      win?.webContents.send("gmail/sync");
+    }
+  }, 5 * 1000);
 });
 
 app.on("window-all-closed", () => {
