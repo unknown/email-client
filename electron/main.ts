@@ -3,8 +3,10 @@ import electron, { app, BrowserWindow, ipcMain, shell } from "electron";
 
 import * as client from "./gmail/client";
 
-const createWindow = () => {
-  const win = new BrowserWindow({
+let win: BrowserWindow | null = null;
+
+function createWindow() {
+  win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -28,20 +30,23 @@ const createWindow = () => {
     event.preventDefault();
     shell.openExternal(event.url);
   });
-};
+}
 
 app.whenReady().then(() => {
-  ipcMain.handle("gmail/list-inbox", async function ipcListInbox() {
+  ipcMain.handle("gmail/list-inbox", function ipcListInbox() {
     return client.listThreads();
   });
-  ipcMain.handle("gmail/get-thread", async function ipcGetThread(_, id) {
+  ipcMain.handle("gmail/get-thread", function ipcGetThread(_, id) {
     return client.getThread(id);
   });
-  ipcMain.handle("gmail/modify-thread", async function ipcModifyThread(_, id, options) {
+  ipcMain.handle("gmail/modify-thread", function ipcModifyThread(_, id, options) {
     return client.modifyThread(id, options);
   });
-  ipcMain.handle("browser/open-url", async function ipcOpenUrl(_, url) {
-    electron.shell.openExternal(url);
+  ipcMain.handle("gmail/sync", function ipcSync() {
+    return client.sync();
+  });
+  ipcMain.handle("browser/open-url", function ipcOpenUrl(_, url) {
+    return electron.shell.openExternal(url);
   });
 
   createWindow();

@@ -10,15 +10,29 @@ function App() {
 
   useEffect(() => {
     let canceled = false;
+
     async function loadInbox() {
       const inbox = await window.gmail.listInbox();
       if (!canceled && inbox !== null) {
         setThreads(inbox);
       }
     }
+
+    async function sync() {
+      const didSync = await window.gmail.sync();
+      if (didSync && !canceled) {
+        loadInbox();
+      }
+    }
+
     loadInbox();
+    sync();
+
+    const syncInterval = setInterval(sync, 10 * 1000);
+
     return () => {
       canceled = true;
+      clearInterval(syncInterval);
     };
   }, []);
 

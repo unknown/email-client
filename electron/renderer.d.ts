@@ -5,6 +5,7 @@ export interface IGmailAPI {
     id: string,
     options: import("googleapis").gmail_v1.Schema$ModifyThreadRequest,
   ) => Promise<import("./gmail/types").EmailThread | null>;
+  sync: () => Promise<boolean>;
 }
 
 export interface IBrowserAPI {
