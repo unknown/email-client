@@ -1,6 +1,11 @@
 import { gmail_v1 } from "googleapis";
 
-import { getMostRecentMessage, insertMessage } from "../database/message";
+import {
+  addMessageLabels,
+  getMostRecentMessage,
+  insertMessage,
+  removeMessageLabels,
+} from "../database/message";
 import {
   getAllThreads,
   getThreadByServerId,
@@ -20,29 +25,54 @@ async function fullSync() {
 }
 
 async function partialSync(historyId: string) {
-  const { messagesAdded } = await api.getUpdates(historyId);
+  const updates = await api.getUpdates(historyId);
 
-  for (const message of messagesAdded) {
-    if (!message.threadId) {
-      console.warn("message.threadId is null");
-      continue;
+  for (const update of updates) {
+    for (const messageAdded of update.messagesAdded ?? []) {
+      const messageServerId = messageAdded.message?.id;
+      const threadServerId = messageAdded.message?.threadId;
+      if (!messageServerId || !threadServerId) {
+        console.warn("New message has a null id or threadId");
+        continue;
+      }
+
+      const dbThread = await getThreadByServerId(threadServerId);
+      if (!dbThread) {
+        const gmailThread = await api.getThread(threadServerId);
+        await insertThread(gmailThread);
+        continue;
+      }
+
+      const message = await api.getMessage(messageServerId);
+      await insertMessage(message, dbThread.id);
+
+      // TODO: hack to update thread historyId
+      await updateThread({
+        id: threadServerId,
+        historyId: message.historyId,
+        messages: [],
+      });
     }
 
-    const thread = await getThreadByServerId(message.threadId);
+    for (const labelAdded of update.labelsAdded ?? []) {
+      const messageServerId = labelAdded.message?.id;
+      if (!messageServerId) {
+        console.warn("New message has a null id");
+        continue;
+      }
 
-    if (!thread) {
-      const newThread = await api.getThread(message.threadId);
-      await insertThread(newThread);
-      continue;
+      await addMessageLabels(messageServerId, labelAdded.labelIds ?? []);
     }
 
-    await insertMessage(message, thread.id);
-    // TODO: verify updating thread historyId like this is ok
-    await updateThread({
-      id: thread.serverId,
-      historyId: message.historyId,
-      messages: [],
-    });
+    for (const labelRemoved of update.labelsRemoved ?? []) {
+      const messageServerId = labelRemoved.message?.id;
+      if (!messageServerId) {
+        console.warn("New message has a null id");
+        continue;
+      }
+
+      await removeMessageLabels(messageServerId, labelRemoved.labelIds ?? []);
+    }
   }
 }
 

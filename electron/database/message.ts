@@ -16,6 +16,12 @@ export function getMostRecentMessage() {
   });
 }
 
+function getLabels(labelIds: string[]) {
+  return {
+    isUnread: labelIds.includes("UNREAD"),
+  };
+}
+
 export function insertMessage(message: EmailMessage, threadId: number) {
   return db.transaction(async (tx) => {
     const insertedMessage = await db
@@ -29,7 +35,7 @@ export function insertMessage(message: EmailMessage, threadId: number) {
         to: message.decodedPayload.headers["To"],
         subject: message.decodedPayload.headers["Subject"],
         snippet: message.snippet,
-        isUnread: message.labelIds?.includes("UNREAD"),
+        ...getLabels(message.labelIds ?? []),
       })
       .returning({ id: messagesTable.id });
 
@@ -56,4 +62,37 @@ export function updateMessage(message: EmailMessage) {
     .update(messagesTable)
     .set({ historyId: message.historyId, isUnread: message.labelIds?.includes("UNREAD") })
     .where(eq(messagesTable.serverId, message.id));
+}
+
+export function updateMessageLabels(serverId: string, labelIds: string[]) {
+  return db
+    .update(messagesTable)
+    .set(getLabels(labelIds))
+    .where(eq(messagesTable.serverId, serverId));
+}
+
+export function addMessageLabels(serverId: string, labelIds: string[]) {
+  const labels = getLabels(labelIds);
+
+  const filtered: Partial<typeof labels> = {};
+  for (const [key, value] of Object.entries(labels)) {
+    if (value) {
+      filtered[key as keyof typeof labels] = true;
+    }
+  }
+
+  return db.update(messagesTable).set(filtered).where(eq(messagesTable.serverId, serverId));
+}
+
+export function removeMessageLabels(serverId: string, labelIds: string[]) {
+  const labels = getLabels(labelIds);
+
+  const filtered: Partial<typeof labels> = {};
+  for (const [key, value] of Object.entries(labels)) {
+    if (!value) {
+      filtered[key as keyof typeof labels] = false;
+    }
+  }
+
+  return db.update(messagesTable).set(filtered).where(eq(messagesTable.serverId, serverId));
 }
