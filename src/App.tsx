@@ -10,12 +10,14 @@ function App() {
 
   useEffect(() => {
     let canceled = false;
+
     async function loadInbox() {
       const inbox = await window.gmail.listInbox();
       if (!canceled && inbox !== null) {
         setThreads(inbox);
       }
     }
+
     loadInbox();
 
     // TODO: remove this listener when the component unmounts

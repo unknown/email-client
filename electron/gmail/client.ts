@@ -45,11 +45,11 @@ async function partialSync(historyId: string) {
       const message = await api.getMessage(messageServerId);
       await insertMessage(message, dbThread.id);
 
-      // TODO: hack to update thread historyId
+      // TODO: hack to update thread historyId and latestMessageDate
       await updateThread({
         id: threadServerId,
         historyId: message.historyId,
-        messages: [],
+        messages: [message],
       });
     }
 
