@@ -14,8 +14,9 @@ export function ThreadItem({ thread, isSelected, onThreadClick }: ThreadItemProp
   const senders = thread.messages.map((message) => message.decodedPayload.headers["From"]);
   const numMessages = thread.messages.length;
 
+  const firstMessage = thread.messages.at(0);
   const lastMessage = thread.messages.at(-1);
-  const subject = lastMessage?.decodedPayload.headers["Subject"];
+  const subject = firstMessage?.decodedPayload.headers["Subject"];
   const snippet = lastMessage?.snippet;
 
   const isUnread = thread.messages.some((message) => message.labelIds?.includes("UNREAD"));
@@ -63,7 +64,7 @@ export function ThreadItem({ thread, isSelected, onThreadClick }: ThreadItemProp
             {dateString}
           </span>
         </div>
-        <h3 className="truncate font-medium">{subject}</h3>
+        <h3 className="truncate font-medium">{subject ?? "(No subject)"}</h3>
         <p className={twMerge("truncate", !isSelected ? "text-tx-2" : null)}>{snippet}</p>
       </div>
     </div>
