@@ -61,27 +61,14 @@ export async function getUpdates(startHistoryId: string) {
   const gmail = await getGmailClient();
 
   // TODO: only returns one page of updates
-  const updates = await gmail.users.history.list({
+  const res = await gmail.users.history.list({
     startHistoryId,
     userId: "me",
   });
 
-  const messagesAdded =
-    updates.data.history?.flatMap((history) => history.messagesAdded ?? []) ?? [];
+  const history = res.data.history ?? [];
 
-  const messages = await Promise.all(
-    messagesAdded.map(async (message) => {
-      if (message.message?.id) {
-        return await getMessage(message.message.id);
-      }
-    }),
-  ).then((messages) =>
-    messages.filter((message): message is EmailMessage => message !== undefined),
-  );
-
-  return {
-    messagesAdded: messages,
-  };
+  return history;
 }
 
 export async function modifyThread(
