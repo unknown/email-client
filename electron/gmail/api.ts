@@ -2,7 +2,7 @@ import { gmail_v1 } from "googleapis";
 
 import { getGmailClient } from "./auth";
 import { decodeEmailMessage, decodeEmailThread } from "./decoder";
-import { EmailMessage, EmailThread } from "./types";
+import { EmailThread } from "./types";
 
 export async function getThread(threadId: string) {
   const gmail = await getGmailClient();
@@ -66,7 +66,7 @@ export async function getUpdates(startHistoryId: string) {
     userId: "me",
   });
 
-  const history = res.data.history ?? [];
+  const history = res.data.history;
 
   return history;
 }

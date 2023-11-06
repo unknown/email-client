@@ -1,11 +1,6 @@
 import { gmail_v1 } from "googleapis";
 
-import {
-  addMessageLabels,
-  getMostRecentMessage,
-  insertMessage,
-  removeMessageLabels,
-} from "../database/message";
+import { getMostRecentMessage, insertMessage, updateMessageLabels } from "../database/message";
 import {
   getAllThreads,
   getThreadByServerId,
@@ -27,6 +22,10 @@ async function fullSync() {
 async function partialSync(historyId: string) {
   const updates = await api.getUpdates(historyId);
 
+  if (!updates) {
+    return false;
+  }
+
   for (const update of updates) {
     for (const messageAdded of update.messagesAdded ?? []) {
       const messageServerId = messageAdded.message?.id;
@@ -46,54 +45,56 @@ async function partialSync(historyId: string) {
       const message = await api.getMessage(messageServerId);
       await insertMessage(message, dbThread.id);
 
-      // TODO: hack to update thread historyId
+      // TODO: hack to update thread historyId and latestMessageDate
       await updateThread({
         id: threadServerId,
         historyId: message.historyId,
-        messages: [],
+        messages: [message],
       });
     }
 
-    for (const labelAdded of update.labelsAdded ?? []) {
-      const messageServerId = labelAdded.message?.id;
-      const messageHistoryId = labelAdded.message?.historyId;
-      if (!messageServerId || !messageHistoryId) {
-        console.warn("New message has a null id or historyId");
+    const labelUpdates = [...(update.labelsAdded ?? []), ...(update.labelsRemoved ?? [])];
+    for (const labelUpdate of labelUpdates) {
+      const messageServerId = labelUpdate.message?.id;
+      if (!messageServerId) {
+        console.warn("New message has a null id");
         continue;
       }
 
-      await addMessageLabels(messageServerId, messageHistoryId, labelAdded.labelIds ?? []);
-    }
-
-    for (const labelRemoved of update.labelsRemoved ?? []) {
-      const messageServerId = labelRemoved.message?.id;
-      const messageHistoryId = labelRemoved.message?.historyId;
-      if (!messageServerId || !messageHistoryId) {
-        console.warn("New message has a null id or historyId");
+      const message = await api.getMessage(messageServerId);
+      if (!message.historyId) {
+        console.warn("New message has a null historyId", messageServerId);
         continue;
       }
 
-      await removeMessageLabels(messageServerId, messageHistoryId, labelRemoved.labelIds ?? []);
+      await updateMessageLabels(messageServerId, message.historyId, message.labelIds ?? []);
     }
   }
+
+  return true;
 }
 
-export async function listThreads(): Promise<EmailThread[] | null> {
+export async function sync(): Promise<boolean> {
   // TODO: sync after returning original threads
   // TODO: use a different heuristic than the most recent message
   // this is fine for now because all our syncing operations are idempotent
   const mostRecentMessage = await getMostRecentMessage();
 
   if (mostRecentMessage?.historyId) {
-    await partialSync(mostRecentMessage.historyId).catch((err) => {
+    return await partialSync(mostRecentMessage.historyId).catch((err) => {
       console.error("Partial sync failed", err);
-    });
-  } else {
-    await fullSync().catch((err) => {
-      console.error("Full sync failed", err);
+      return false;
     });
   }
 
+  await fullSync().catch((err) => {
+    console.error("Full sync failed", err);
+  });
+
+  return true;
+}
+
+export async function listThreads(): Promise<EmailThread[] | null> {
   const threads = await getAllThreads().catch((err) => {
     console.error("Failed to get all threads", err);
     return null;
