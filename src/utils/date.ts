@@ -27,24 +27,35 @@ type FormatDateOptions =
       relativeDateStyleFallback: Intl.DateTimeFormatOptions["dateStyle"];
     });
 
+function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 export function formatDate(date: Date | null | undefined, options?: FormatDateOptions) {
   if (!date) {
     return null;
   }
 
-  if (options?.dateStyle === "relative") {
-    const { dateStyle, relativeDateStyleFallback, ...rest } = options;
-    const formattedDate = date.toLocaleString(undefined, { ...rest, dateStyle: "medium" });
-    const formattedOnlyDate = date.toLocaleDateString(undefined, { dateStyle: "medium" });
+  switch (options?.dateStyle) {
+    case "relative": {
+      const { dateStyle: _, relativeDateStyleFallback, ...rest } = options;
 
-    if (isDateToday(date)) {
-      return formattedDate.replace(formattedOnlyDate, "Today");
-    } else if (isDateYesterday(date)) {
-      return formattedDate.replace(formattedOnlyDate, "Yesterday");
-    } else {
-      return date.toLocaleString(undefined, { ...options, dateStyle: relativeDateStyleFallback });
+      const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+      const formattedDate = date.toLocaleString(undefined, { ...rest, dateStyle: "medium" });
+      const formattedOnlyDate = date.toLocaleDateString(undefined, { dateStyle: "medium" });
+
+      if (isDateToday(date)) {
+        const todayString = rtf.format(0, "day");
+        return formattedDate.replace(formattedOnlyDate, capitalizeFirstLetter(todayString));
+      } else if (isDateYesterday(date)) {
+        const yesterdayString = rtf.format(-1, "day");
+        return formattedDate.replace(formattedOnlyDate, capitalizeFirstLetter(yesterdayString));
+      } else {
+        return date.toLocaleString(undefined, { ...rest, dateStyle: relativeDateStyleFallback });
+      }
+    }
+    default: {
+      return date.toLocaleString(undefined, { ...options, dateStyle: options?.dateStyle });
     }
   }
-
-  return date.toLocaleString(undefined, { ...options, dateStyle: options?.dateStyle });
 }
