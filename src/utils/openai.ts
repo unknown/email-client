@@ -25,7 +25,7 @@ export function summarizeMessage(message: EmailMessage) {
 }
 
 export function summarizeThread(thread: EmailThread) {
-  const subject = thread.messages.at(-1)?.decodedPayload.headers["Subject"];
+  const subject = thread.messages.at(0)?.decodedPayload.headers["Subject"];
   const emailMessages = thread.messages.map(({ decodedPayload }) => {
     const from = decodedPayload.headers["From"];
     const message = decodedPayload.text ?? decodedPayload.html ?? "";

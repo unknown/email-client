@@ -22,8 +22,8 @@ export function ThreadView({ thread }: ThreadViewProps) {
     );
   }
 
-  const latestMessage = thread.messages.at(-1);
-  if (!latestMessage) {
+  const firstMessage = thread.messages.at(0);
+  if (!firstMessage) {
     return (
       <div className="flex items-center">
         <p className="w-full text-center">Empty email thread</p>
@@ -31,11 +31,11 @@ export function ThreadView({ thread }: ThreadViewProps) {
     );
   }
 
-  const subject = latestMessage.decodedPayload.headers["Subject"];
+  const subject = firstMessage.decodedPayload.headers["Subject"];
 
   return (
     <div className="flex flex-col gap-2 overflow-scroll px-6 py-4">
-      {subject && <h1 className="text-lg font-bold">{subject}</h1>}
+      <h1 className="text-lg font-bold">{subject ?? "(No subject)"}</h1>
       <GenerationBanner
         summary={summary}
         isLoading={isLoading}
