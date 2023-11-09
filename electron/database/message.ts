@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 import { EmailMessage } from "../gmail/types";
 import { db } from "./db";
@@ -11,9 +11,9 @@ export function getAllMessages() {
 }
 
 export function getMostRecentMessage() {
-  return db.query.messages.findFirst({
-    orderBy: [desc(messagesTable.historyId)],
-  });
+  return db.get<Message | undefined>(
+    sql`select * from ${messagesTable} order by cast(${messagesTable.historyId} as integer) desc limit 1`,
+  );
 }
 
 function getLabels(labelIds: string[]) {
