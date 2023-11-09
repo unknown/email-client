@@ -78,7 +78,7 @@ export async function sync(): Promise<boolean> {
   // TODO: sync after returning original threads
   // TODO: use a different heuristic than the most recent message
   // this is fine for now because all our syncing operations are idempotent
-  const mostRecentMessage = await getMostRecentMessage();
+  const mostRecentMessage = getMostRecentMessage();
 
   if (mostRecentMessage?.historyId) {
     return await partialSync(mostRecentMessage.historyId).catch((err) => {
