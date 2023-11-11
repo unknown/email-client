@@ -38,11 +38,18 @@ async function partialSync(historyId: string) {
       const dbThread = await getThreadByServerId(threadServerId);
       if (!dbThread) {
         const gmailThread = await api.getThread(threadServerId);
-        await insertThread(gmailThread);
+        if (gmailThread) {
+          await insertThread(gmailThread);
+        }
         continue;
       }
 
       const message = await api.getMessage(messageServerId);
+      if (!message) {
+        console.error("Failed to get message", messageServerId);
+        continue;
+      }
+
       await insertMessage(message, dbThread.id);
 
       // TODO: hack to update thread historyId and latestMessageDate
@@ -62,6 +69,11 @@ async function partialSync(historyId: string) {
       }
 
       const message = await api.getMessage(messageServerId);
+      if (!message) {
+        console.error("Failed to get message", messageServerId);
+        continue;
+      }
+
       if (!message.historyId) {
         console.warn("New message has a null historyId", messageServerId);
         continue;

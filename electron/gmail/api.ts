@@ -6,22 +6,32 @@ import { EmailThread } from "./types";
 
 export async function getThread(threadId: string) {
   const gmail = await getGmailClient();
-  const res = await gmail.users.threads.get({
-    id: threadId,
-    userId: "me",
-    format: "full",
-  });
-  return decodeEmailThread(res.data);
+  return await gmail.users.threads
+    .get({
+      id: threadId,
+      userId: "me",
+      format: "full",
+    })
+    .then((res) => decodeEmailThread(res.data))
+    .catch((err) => {
+      console.error("Failed to get thread", err);
+      return null;
+    });
 }
 
 export async function getMessage(messageId: string) {
   const gmail = await getGmailClient();
-  const res = await gmail.users.messages.get({
-    id: messageId,
-    userId: "me",
-    format: "full",
-  });
-  return decodeEmailMessage(res.data);
+  return await gmail.users.messages
+    .get({
+      id: messageId,
+      userId: "me",
+      format: "full",
+    })
+    .then((res) => decodeEmailMessage(res.data))
+    .catch((err) => {
+      console.error("Failed to get message", err);
+      return null;
+    });
 }
 
 export async function listInboxThreads(maxThreads: number = 100): Promise<EmailThread[]> {
@@ -30,14 +40,19 @@ export async function listInboxThreads(maxThreads: number = 100): Promise<EmailT
   const threads: EmailThread[] = [];
 
   while (threads.length < maxThreads) {
-    const res = await gmail.users.threads.list({
-      labelIds: ["INBOX"],
-      pageToken: nextPageToken ?? undefined,
-      maxResults: 20,
-      userId: "me",
-    });
+    const res = await gmail.users.threads
+      .list({
+        labelIds: ["INBOX"],
+        pageToken: nextPageToken ?? undefined,
+        maxResults: 20,
+        userId: "me",
+      })
+      .catch((err) => {
+        console.error("Failed to list threads", err);
+        return null;
+      });
 
-    const resThreads = res.data.threads ?? [];
+    const resThreads = res?.data.threads ?? [];
     const decodedThreads = await Promise.all(
       resThreads.map(async (thread) => {
         if (thread.id) {
@@ -47,7 +62,7 @@ export async function listInboxThreads(maxThreads: number = 100): Promise<EmailT
     ).then((threads) => threads.filter((thread): thread is EmailThread => thread !== undefined));
     threads.push(...decodedThreads);
 
-    nextPageToken = (res.data.nextPageToken ?? null) as string | null;
+    nextPageToken = (res?.data.nextPageToken ?? null) as string | null;
 
     if (nextPageToken === null) {
       break;
@@ -61,27 +76,33 @@ export async function getUpdates(startHistoryId: string) {
   const gmail = await getGmailClient();
 
   // TODO: only returns one page of updates
-  const res = await gmail.users.history.list({
-    startHistoryId,
-    userId: "me",
-  });
+  const res = await gmail.users.history
+    .list({
+      startHistoryId,
+      userId: "me",
+    })
+    .catch((err) => {
+      console.error("Failed to get updates", err);
+      return null;
+    });
 
-  const history = res.data.history;
+  const history = res?.data.history ?? null;
 
   return history;
 }
 
-export async function modifyThread(
-  id: string,
-  options: gmail_v1.Schema$ModifyThreadRequest,
-): Promise<EmailThread> {
+export async function modifyThread(id: string, options: gmail_v1.Schema$ModifyThreadRequest) {
   const gmail = await getGmailClient();
 
-  await gmail.users.threads.modify({
-    id,
-    userId: "me",
-    requestBody: options,
-  });
-
-  return getThread(id);
+  return await gmail.users.threads
+    .modify({
+      id,
+      userId: "me",
+      requestBody: options,
+    })
+    .then(() => getThread(id))
+    .catch((err) => {
+      console.error("Failed to modify thread", err);
+      return null;
+    });
 }
