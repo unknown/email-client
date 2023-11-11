@@ -12,7 +12,7 @@ export function getAllMessages() {
 
 export function getMostRecentMessage() {
   return db.query.messages.findFirst({
-    orderBy: sql`cast(${messagesTable.internalDate} as integer) desc`,
+    orderBy: sql`cast(${messagesTable.historyId} as integer) desc`,
   });
 }
 
