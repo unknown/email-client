@@ -11,9 +11,9 @@ export function getAllMessages() {
 }
 
 export function getMostRecentMessage() {
-  return db.get<Message | undefined>(
-    sql`select * from ${messagesTable} order by cast(${messagesTable.historyId} as integer) desc limit 1`,
-  );
+  return db.query.messages.findFirst({
+    orderBy: sql`cast(${messagesTable.historyId} as integer) desc`,
+  });
 }
 
 function getLabels(labelIds: string[]) {

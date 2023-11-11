@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 import { EmailThread } from "../gmail/types";
 import { db } from "./db";
@@ -10,7 +10,7 @@ export type Thread = typeof threadsTable.$inferSelect;
 export function getAllThreads() {
   return db.query.threads.findMany({
     with: { messages: true },
-    orderBy: [desc(threadsTable.latestMessageDate)],
+    orderBy: sql`cast(${threadsTable.latestMessageDate} as integer) desc`,
   });
 }
 
