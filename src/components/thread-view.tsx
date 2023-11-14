@@ -16,8 +16,8 @@ export function ThreadView({ thread }: ThreadViewProps) {
 
   if (!thread) {
     return (
-      <div className="flex items-center">
-        <p className="w-full text-center">No email selected</p>
+      <div className="flex h-full items-center">
+        <p className="mx-auto">No email selected</p>
       </div>
     );
   }
@@ -25,8 +25,8 @@ export function ThreadView({ thread }: ThreadViewProps) {
   const firstMessage = thread.messages.at(0);
   if (!firstMessage) {
     return (
-      <div className="flex items-center">
-        <p className="w-full text-center">Empty email thread</p>
+      <div className="flex h-full items-center">
+        <p className="mx-auto">Empty email thread</p>
       </div>
     );
   }
@@ -34,7 +34,7 @@ export function ThreadView({ thread }: ThreadViewProps) {
   const subject = firstMessage.decodedPayload.headers["Subject"];
 
   return (
-    <div className="flex flex-col gap-2 overflow-scroll px-6 py-4">
+    <div className="flex h-full flex-col gap-2 overflow-scroll px-6 py-4">
       <h1 className="text-lg font-bold">{subject ?? "(No subject)"}</h1>
       <GenerationBanner
         summary={summary}
