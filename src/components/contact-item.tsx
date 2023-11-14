@@ -7,7 +7,7 @@ type ContactItemProps = {
 
 export function ContactItem({ label, contact }: ContactItemProps) {
   const { name, email } = getNameAndEmail(contact);
-  const nameText = name ?? contact;
+  const nameText = name ?? email ?? contact;
 
   if (!label) {
     return (
