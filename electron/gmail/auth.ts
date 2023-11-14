@@ -35,17 +35,17 @@ async function saveCredentials(client: Auth.OAuth2Client) {
 }
 
 async function authorize() {
-  let client: Auth.OAuth2Client | null = await loadSavedCredentialsIfExist();
-  if (client) {
-    return client;
+  const savedClient = await loadSavedCredentialsIfExist();
+  if (savedClient) {
+    await savedClient.refreshAccessToken();
+    return savedClient;
   }
-  client = await authenticate({
-    scopes: SCOPES,
-    keyfilePath: CREDENTIALS_PATH,
-  });
+
+  const client = await authenticate({ scopes: SCOPES, keyfilePath: CREDENTIALS_PATH });
   if (client.credentials) {
     await saveCredentials(client);
   }
+
   return client;
 }
 
