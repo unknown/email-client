@@ -21,7 +21,7 @@ export function ThreadList({
   }
 
   return (
-    <div className="flex flex-col divide-y overflow-scroll p-2">
+    <div className="flex h-full flex-col divide-y overflow-scroll p-2">
       {threads.map((thread, i) => (
         <ThreadItem
           key={thread.id ?? i}

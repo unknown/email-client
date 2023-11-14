@@ -80,8 +80,8 @@ function App() {
   }
 
   return (
-    <div className="flex h-screen flex-col gap-2">
-      <PanelGroup direction="horizontal">
+    <div className="flex h-screen flex-col">
+      <PanelGroup autoSaveId="thread-list" direction="horizontal">
         <Panel minSizePixels={240} maxSizePercentage={50} defaultSizePixels={300}>
           <ThreadList
             threads={threads}
