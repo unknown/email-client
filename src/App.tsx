@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 import { EmailThread } from "@/electron/gmail/types";
@@ -9,33 +9,34 @@ function App() {
   const [threads, setThreads] = useState<EmailThread[] | null>(null);
   const [thread, setThread] = useState<EmailThread | null>(null);
 
-  useEffect(() => {
-    let canceled = false;
-
-    async function loadInbox() {
-      const inbox = await window.gmail.listInbox();
-      if (!canceled && inbox !== null) {
-        setThreads(inbox);
-      }
+  const loadInbox = useCallback(async (abortSignal?: AbortSignal) => {
+    const inbox = await window.gmail.listInbox();
+    if (!abortSignal?.aborted && inbox !== null) {
+      setThreads(inbox);
     }
+  }, []);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    loadInbox(abortController.signal);
 
     async function sync() {
       const didSync = await window.gmail.sync();
-      if (didSync && !canceled) {
+      if (didSync) {
+        // TODO: not passing abort signal here, so we might be setting state after unmount
         loadInbox();
       }
     }
 
-    loadInbox();
     sync();
-
     const syncInterval = setInterval(sync, 10 * 1000);
 
     return () => {
-      canceled = true;
+      abortController.abort();
       clearInterval(syncInterval);
     };
-  }, []);
+  }, [loadInbox]);
 
   async function onThreadClick(threadId: string | null) {
     if (!threadId || thread?.id === threadId) {
