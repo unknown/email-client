@@ -16,19 +16,18 @@ function App() {
     }
   }, []);
 
+  // TODO: no abortsignal here
+  const sync = useCallback(async () => {
+    const didSync = await window.gmail.sync();
+    if (didSync) {
+      loadInbox();
+    }
+  }, [loadInbox]);
+
   useEffect(() => {
     const abortController = new AbortController();
 
     loadInbox(abortController.signal);
-
-    async function sync() {
-      const didSync = await window.gmail.sync();
-      if (didSync) {
-        // TODO: not passing abort signal here, so we might be setting state after unmount
-        loadInbox();
-      }
-    }
-
     sync();
     const syncInterval = setInterval(sync, 10 * 1000);
 
@@ -36,7 +35,7 @@ function App() {
       abortController.abort();
       clearInterval(syncInterval);
     };
-  }, [loadInbox]);
+  }, [loadInbox, sync]);
 
   async function onThreadClick(threadId: string | null) {
     if (!threadId || thread?.id === threadId) {
