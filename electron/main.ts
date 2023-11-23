@@ -12,6 +12,9 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
+    vibrancy: "under-window",
+    titleBarStyle: "hidden",
+    frame: false,
   });
 
   if (process.env.VITE_DEV_SERVER_URL) {

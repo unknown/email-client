@@ -36,7 +36,7 @@ export function ThreadItem({ thread, isSelected, onThreadClick }: ThreadItemProp
   return (
     <div
       className={twMerge(
-        "relative flex break-words px-4 py-2 text-sm",
+        "no-drag relative flex break-words px-4 py-2 text-sm",
         isSelected ? "text-white" : null,
       )}
       onClick={onThreadClick}
