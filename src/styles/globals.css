@@ -48,9 +48,18 @@
 
 @layer base {
   body {
-    @apply bg-bg text-tx;
+    @apply bg-transparent text-tx;
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
+  }
+
+  .title-bar {
+    -webkit-app-select: none;
+    -webkit-app-region: drag;
+  }
+
+  .no-drag {
+    -webkit-app-region: no-drag;
   }
 }

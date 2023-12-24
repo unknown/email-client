@@ -82,7 +82,12 @@ function App() {
   return (
     <div className="flex h-screen flex-col">
       <PanelGroup autoSaveId="thread-list" direction="horizontal">
-        <Panel minSizePixels={240} maxSizePercentage={50} defaultSizePixels={300}>
+        <Panel
+          className="title-bar"
+          minSizePixels={240}
+          maxSizePercentage={50}
+          defaultSizePixels={300}
+        >
           <ThreadList
             threads={threads}
             selectedThreadId={thread?.id ?? null}
@@ -92,7 +97,7 @@ function App() {
         <PanelResizeHandle className="w-1">
           <div className="mx-auto h-full w-px bg-ui" />
         </PanelResizeHandle>
-        <Panel>
+        <Panel className="bg-bg">
           <ThreadView key={thread?.id} thread={thread} />
         </Panel>
       </PanelGroup>
